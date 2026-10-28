@@ -8,7 +8,7 @@ import { resultText, statusLabel } from './MatchCard.jsx';
 const fmt = (n) => (Number.isInteger(n) ? String(n) : `${Math.floor(n)}½`.replace(/^0½/, '½'));
 
 export default function Leaderboard() {
-  const { me, list } = useStore();
+  const { me, list, updated } = useStore();
   const { players, courses, teeTimes, settings } = useLookups();
   const results = list('results');
   const st = standings(teeTimes, results, settings, players);
@@ -22,6 +22,7 @@ export default function Leaderboard() {
       <header className="page-head">
         <div className="kicker">2026 Halcyon Days Bandon Shoe</div>
         <h1>Leaderboard</h1>
+        {updated && <p className="small muted">Scores updated {new Date(updated).toLocaleString('en-US', { timeZone: 'America/Los_Angeles', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} Pacific · {st.played} of {st.matchCount} matches posted</p>}
       </header>
 
       {st.clinched && <div className="clinched"><TeamDot team={st.clinched} size={12} /> {teamName(st.clinched, settings)} have clinched the Shoe</div>}

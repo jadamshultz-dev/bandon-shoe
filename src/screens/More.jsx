@@ -13,7 +13,7 @@ const MENU = [
 ];
 
 export default function More() {
-  const { me, switchPlayer, updated } = useStore();
+  const { me, switchPlayer } = useStore();
   return (
     <div className="page">
       <PageHead kicker={me ? `You're ${me.name}` : ''} title="More" />
@@ -23,7 +23,6 @@ export default function More() {
       <div className="actions">
         <button className="btn" onClick={() => { switchPlayer(); go('myday'); }}>Not {me?.nickname || me?.name?.split(' ')[0]}? Switch golfer</button>
       </div>
-      {updated && <p className="small muted">App last updated {new Date(updated).toLocaleString('en-US', { timeZone: 'America/Los_Angeles', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} Pacific. Results and changes come from Josh.</p>}
     </div>
   );
 }
@@ -200,7 +199,6 @@ const PLACES = [
   ['Bandon Dunes Practice Center', "Charlotte's"],
   ['The Punchbowl', 'Putting course'],
   ["Shorty's", 'Short course and clubhouse'],
-  ['Bandon Inn, Bandon OR', 'In town · Sunday Nov 1'],
 ];
 export function MapScreen() {
   return (
