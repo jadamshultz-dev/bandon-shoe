@@ -33,6 +33,12 @@ The paper scorecard is always the official record.
 - The equitable adjustment: −1 to a player's handicap for each Shoe match he wins, +1 for each loss, applied to his later sessions.
 - Team points (27 in all, 14 to win), session totals, player records and the clinch banner.
 
+## Thursday Preserve Stableford
+
+The one place players enter scores themselves: More → Preserve Stableford (or the button on Thursday's My Day). Any of the eight Preserve players taps a name and picks a score for each hole; points (ace 10, birdie 5, par 3, bogey 1, worse 0) and the standings update for everyone within 15 seconds.
+
+Scores are stored by a small Netlify Function (`netlify/functions/preserve.mjs`) in Netlify Blobs. Nothing to set up: Netlify creates the store on the first save.
+
 ## Hosting
 
 GitHub (`jadamshultz-dev/bandon-shoe`) → Netlify. Every push to `main` deploys. Netlify needs no environment variables.

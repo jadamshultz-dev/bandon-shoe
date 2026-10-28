@@ -216,3 +216,12 @@ export function playerRecords(teeTimes, results, playersById) {
 }
 
 export const MARGINS = ['1 up', '2 up', '2&1', '3&1', '3&2', '4&2', '4&3', '5&3', '5&4', '6&4', '6&5', '7&5', '7&6', '8&6', '8&7', '9&7', '9&8', '10&8', 'Won 19th', 'Won 20th'];
+
+/** Thursday Preserve Stableford: ace 10, birdie 5, par 3, bogey 1, worse 0. */
+export function stablefordPoints(score, par = 3) {
+  if (score === null || score === undefined || score === '') return null;
+  const s = Number(score);
+  if (s === 1) return 10;
+  const d = s - par;
+  return d <= -1 ? 5 : d === 0 ? 3 : d === 1 ? 1 : 0;
+}

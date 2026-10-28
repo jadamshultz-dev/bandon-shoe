@@ -4,6 +4,7 @@ import { dayLabel, fmtTime, openState } from '../lib/time.js';
 import { Back, CopyText, Empty, PageHead, Pill, Section, TeamDot, Who, go, teamName, useLookups } from '../ui.jsx';
 
 const MENU = [
+  ['preserve', 'Preserve Stableford', 'Thursday’s par-3 round: enter scores and see standings'],
   ['dining', 'Dining', 'Restaurants, hours and group dinners'],
   ['caddies', 'Caddies', 'Who carries for whom, and caddie fees'],
   ['lodging', 'Lodging', 'Rooms, check-in and checkout'],

@@ -4,6 +4,7 @@ import MyDay from './screens/MyDay.jsx';
 import Leaderboard from './screens/Leaderboard.jsx';
 import Schedule from './screens/Schedule.jsx';
 import MatchCard from './screens/MatchCard.jsx';
+import Preserve from './screens/Preserve.jsx';
 import Courses, { CourseDetail } from './screens/Courses.jsx';
 import More, { Caddies, Dining, Info, Lodging, MapScreen, Players } from './screens/More.jsx';
 import { TeamDot, go } from './ui.jsx';
@@ -48,6 +49,7 @@ function Screen({ route }) {
     case 'players': return <Players />;
     case 'map': return <MapScreen />;
     case 'info': return <Info />;
+    case 'preserve': return <Preserve />;
     default: return <MyDay />;
   }
 }

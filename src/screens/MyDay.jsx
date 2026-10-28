@@ -95,6 +95,7 @@ export default function MyDay() {
             <div className="round-top"><span className="round-time">{preserveTimes.map((t) => fmtTime(t.time)).join(' / ')}</span><span className="round-course">Bandon Preserve</span><Pill>Optional</Pill></div>
             <p className="small">13-hole par-3 course before the 11:20 Pacific Dunes tee times.</p>
             <p className="small">{myPreserve?.status === 'in' ? <b>You’re on the list.</b> : <span className="muted">You’re not on the list.</span>} <span className="muted">Playing: {preserveIn.map((r) => players[r.player]?.initials).join(', ')}</span></p>
+            <button className="btn primary small" onClick={() => go('preserve')}>Stableford scorecard</button>
           </div>
         )}
       </Section>
