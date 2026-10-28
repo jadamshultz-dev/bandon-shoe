@@ -67,11 +67,12 @@ export default function App() {
   else if (!me) body = <NamePicker />;
   else body = null;
 
-  if (body) return <div className="app">{body}{toast && <div className={`toast ${toast.tone}`} role="status">{toast.text}</div>}</div>;
+  if (body) return <div className="app">{store.loadError && <div className="load-error"><b>Showing built-in data.</b> {store.loadError} <span className="muted">· {store.supaHost}</span></div>}{body}{toast && <div className={`toast ${toast.tone}`} role="status">{toast.text}</div>}</div>;
 
   const tab = tabFor(route);
   return (
     <div className="app">
+      {store.loadError && <div className="load-error"><b>Showing built-in data.</b> {store.loadError} <span className="muted">· {store.supaHost}</span></div>}
       {(!online || queue.length > 0) && <div className="offline">{!online ? 'No signal. Showing saved data.' : ''}{queue.length > 0 ? ` ${queue.length} change${queue.length === 1 ? '' : 's'} waiting to sync.` : ''}</div>}
       <main className="main"><Screen route={route} /></main>
       <nav className="tabbar" aria-label="Main">

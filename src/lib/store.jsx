@@ -4,8 +4,9 @@ import { ENV } from './env.js';
 
 export const TABLES = ['players', 'tee_times', 'results', 'settings', 'courses', 'restaurants', 'rooms', 'rides', 'rsvps', 'announcements', 'dinners'];
 
-const SUPA_URL = ENV.VITE_SUPABASE_URL;
-const SUPA_KEY = ENV.VITE_SUPABASE_ANON_KEY;
+// Accept the URL however it was pasted: trims spaces, a trailing slash, or a copied /rest/v1 endpoint.
+const SUPA_URL = (ENV.VITE_SUPABASE_URL || '').trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, '').replace(/\/+$/, '');
+const SUPA_KEY = (ENV.VITE_SUPABASE_ANON_KEY || '').trim().replace(/^['"]|['"]$/g, '');
 export const MODE = ENV.VITE_DEMO === '1' || !SUPA_URL || !SUPA_KEY ? 'demo' : 'live';
 
 const DEMO_KEY = 'bandon-shoe-demo-v13';
@@ -42,6 +43,7 @@ export function StoreProvider({ children }) {
   const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
   const [queue, setQueue] = useState(() => ls.get(QUEUE_KEY) || []);
   const [toast, setToast] = useState(null);
+  const [loadError, setLoadError] = useState(null);
   const sb = useRef(null);
   const stateRef = useRef(state);
   stateRef.current = state;
@@ -66,10 +68,15 @@ export function StoreProvider({ children }) {
     const next = {};
     for (const t of TABLES) {
       const { data, error } = await client.from(t).select('id,data');
-      if (error) { notify(isNetwork(error) ? 'No signal. Showing saved data.' : `Could not load ${t}: ${error.message}`, isNetwork(error) ? 'warn' : 'bad'); setReady(true); return; }
+      if (error) {
+        if (isNetwork(error)) notify('No signal. Showing saved data.', 'warn');
+        else setLoadError(`Couldn't load ${t} from the database: ${error.message || error.code || 'unknown error'}${error.hint ? ` (${error.hint})` : ''}`);
+        console.error('[bandon-shoe] load failed', t, error);
+        setReady(true); return;
+      }
       next[t] = Object.fromEntries(data.map((r) => [r.id, { ...r.data, id: r.id }]));
     }
-    setState(next); ls.set(CACHE_KEY, next); setReady(true);
+    setState(next); ls.set(CACHE_KEY, next); setReady(true); setLoadError(null);
   }, [notify]);
 
   useEffect(() => {
@@ -249,7 +256,7 @@ export function StoreProvider({ children }) {
   const settings = state.settings?.main || seed.settings[0];
 
   const value = {
-    mode: MODE, ready, state, list, settings, me, isAdmin, canCaddie, needsPin, online, queue,
+    mode: MODE, ready, loadError, supaHost: SUPA_URL.replace(/^https?:\/\//, ''), state, list, settings, me, isAdmin, canCaddie, needsPin, online, queue,
     save, remove, audit, loadAudit, undo, choosePlayer, switchPlayer, unlockWithPin, resetDemo, notify, toast,
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
