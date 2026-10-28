@@ -13,6 +13,7 @@ const CACHE_KEY = 'bandon-shoe-cache-v3';
 const QUEUE_KEY = 'bandon-shoe-queue-v2';
 const ME_KEY = 'bandon-shoe-me';
 const PIN_KEY = 'bandon-shoe-pin';
+const LINK_KEY = 'bandon-shoe-admin-link';
 
 // Fields only the admins (Marc, Josh, Mike) can change on a player profile.
 export const PROTECTED_PLAYER_FIELDS = ['role', 'team', 'captain', 'index', 'name', 'initials'];
@@ -115,6 +116,30 @@ export function StoreProvider({ children }) {
     notify(role === 'admin' ? 'Admin tools unlocked' : 'Caddie editing unlocked');
     return null;
   }, [role, me, notify]);
+
+  // ---------- private admin link: ?admin=<code> ----------
+  // The code is the admin PIN. Opening the link saves it on this phone and removes it from the
+  // address bar; once the golfer picks an admin name, the tools unlock without typing anything.
+  const [linkKey, setLinkKey] = useState(() => ls.get(LINK_KEY));
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get('admin');
+      if (!code) return;
+      ls.set(LINK_KEY, code); setLinkKey(code);
+      url.searchParams.delete('admin');
+      window.history.replaceState(null, '', url.pathname + (url.search || '') + url.hash);
+    } catch { /* ignore */ }
+  }, []);
+  const triedLink = useRef(null);
+  useEffect(() => {
+    if (MODE !== 'live' || !linkKey || !me || !needsPin || !sb.current || !ready) return;
+    if (triedLink.current === `${me.id}:${linkKey}`) return;
+    triedLink.current = `${me.id}:${linkKey}`;
+    unlockWithPin(linkKey).then((err) => {
+      if (err === 'That PIN doesn’t match.') { ls.del(LINK_KEY); setLinkKey(null); notify('That admin link is out of date. Ask Josh for a new one.', 'bad'); }
+    });
+  }, [linkKey, me, needsPin, ready, unlockWithPin, notify]);
 
   // ---------- writes ----------
   const pushQueue = useCallback((op) => {

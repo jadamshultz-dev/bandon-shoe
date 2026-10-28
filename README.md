@@ -39,6 +39,18 @@ Push this folder to a new private repo.
 2. Site configuration → Environment variables: add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 3. Deploy, then text the link to the group. Each golfer taps his name.
 
+## Admin links for Marc, Josh and Mike
+
+Instead of typing a PIN, each admin taps a private link once:
+
+`https://YOUR-SITE.netlify.app/?admin=YOUR-ADMIN-PIN`
+
+The app saves the code on that phone, removes it from the address bar, and unlocks the admin tools as soon as he taps his name. Send the link to each admin directly, never to the group thread: anyone who has it gets scoring rights. If it leaks, change the admin PIN in Supabase (see below) and send new links; old links stop working and say so.
+
+iPhone: open the admin link in Safari, then Share → Add to Home Screen from that page, so the home-screen app starts unlocked. (Safari and home-screen apps keep separate storage.)
+
+Typing the PIN under More → Unlock still works as a backup.
+
 ## PINs and who can change what
 
 There's no sign-in, so anyone with the link can open the app and pick any name. Keep the link to the group. The PINs keep the scoring safe:
