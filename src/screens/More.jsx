@@ -6,7 +6,7 @@ import { Back, CopyText, Empty, PageHead, Pill, Section, TeamDot, Who, go, teamN
 const MENU = [
   ['dining', 'Dining', 'Restaurants, hours and group dinners'],
   ['caddies', 'Caddies', 'Who carries for whom, and caddie fees'],
-  ['lodging', 'Lodging', 'Rooms, check-in and Sunday night'],
+  ['lodging', 'Lodging', 'Rooms, check-in and checkout'],
   ['players', 'Players', 'Roster, handicaps and GHIN'],
   ['map', 'Map', 'Lodges, first tees and restaurants'],
   ['info', 'Resort info', 'Rules, phone numbers and pace of play'],
@@ -153,10 +153,6 @@ export function Lodging() {
             </div>
           ))}
         </div>
-      </Section>
-      <Section title="Sunday night, Nov 1">
-        <p className="note">Not at the resort. Most of the group is at the Bandon Inn in town.</p>
-        <ul className="plain-list">{Object.values(players).filter((p) => p.id !== 'aw' && !p.guest).map((p) => <li key={p.id}><Who pid={p.id} players={players} me={me} /> <span className="small">{p.sundayLodging || '—'}</span></li>)}</ul>
       </Section>
     </div>
   );
