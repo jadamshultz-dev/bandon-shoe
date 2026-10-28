@@ -95,16 +95,22 @@ const courses = [
 for (let i = 0; i < courses.length; i++) courses[i] = applyScorecard(courses[i]);
 
 const H = (meal, open, close) => ({ meal, open, close });
+// Menus: the latest menu the resort has posted for each outlet, or its current dining page where no
+// recent menu is posted (the Gallery reopened in 2026 with a new Italian menu). Phones from the resort's dining page.
+const DINING = 'https://bandondunesgolf.com/dining/restaurants/';
+const UP = 'https://bandondunesgolf.com/wp-content/uploads/';
 const restaurants = [
-  { id: 'ghost-tree', name: 'Ghost Tree Grill', kind: 'Steakhouse and raw bar', where: '', phone: '(855) 220-6710', booking: 'Reservations', hours: [H('Dinner', '17:00', '22:00')], verified: false },
-  { id: 'gallery', name: 'The Gallery & Puffin Bar', kind: 'Main dining room, breakfast buffet', where: 'Main Lodge', phone: '', booking: 'Reservations recommended for dinner', hours: [H('Breakfast', '06:00', '11:00'), H('Lunch', '11:00', '17:00'), H('Dinner', '17:00', '22:00')], verified: false },
-  { id: 'mckees', name: "McKee's Pub", kind: 'Scottish-style pub', where: '', phone: '', booking: 'Walk-in only', hours: [H('Dinner', '16:00', '23:00')], verified: false },
-  { id: 'pacific-grill', name: 'Pacific Grill', kind: 'Clubhouse restaurant', where: 'Pacific Dunes clubhouse', phone: '', booking: '', hours: [], verified: false },
-  { id: 'trails-end', name: 'Trails End', kind: 'Pacific Rim plates', where: 'Bandon Trails / Preserve clubhouse', phone: '', booking: '', hours: [], verified: false },
-  { id: 'charlottes', name: "Charlotte's", kind: 'Quick bite before a round', where: 'Practice Center', phone: '', booking: '', hours: [], verified: false },
-  { id: 'shortys', name: "Shorty's", kind: 'Quick-serve street food', where: "Shorty's clubhouse", phone: '', booking: '', hours: [], verified: false },
-  { id: 'bunker-bar', name: 'Bunker Bar', kind: 'Late-night bar', where: '', phone: '', booking: '', hours: [], verified: false },
-  { id: 'wheelhouse', name: 'The Wheelhouse', kind: 'Restaurant in Bandon (off resort)', where: 'Old Town Bandon', phone: '', booking: 'Reservation (Marc)', hours: [], verified: false },
+  { id: 'ghost-tree', name: 'Ghost Tree Grill', kind: 'Steakhouse and raw bar', where: '', phone: '(855) 220-6710', booking: 'Reservations', hours: [H('Dinner', '17:00', '22:00')], verified: false, menu: DINING, menuNote: 'Current menus on the resort site' },
+  { id: 'gallery', name: 'The Gallery & Puffin Bar', kind: 'Main dining room; new Italian menu for lunch and dinner', where: 'Main Lodge', phone: '(541) 347-5220', booking: 'Reservations recommended for dinner', hours: [H('Breakfast', '06:00', '11:00'), H('Lunch', '11:00', '17:00'), H('Dinner', '17:00', '22:00')], verified: false, menu: DINING, menuNote: 'New 2026 menu on the resort site' },
+  { id: 'mckees', name: "McKee's Pub", kind: 'Scottish-style pub', where: '', phone: '(541) 347-5861', booking: 'Walk-in only', hours: [H('Dinner', '16:00', '23:00')], verified: false, menu: UP + '2025/08/McKees-Pub-Menu-8-1-25-Dinner.pdf', menuNote: 'Dinner menu, Aug 2025' },
+  { id: 'pacific-grill', name: 'Pacific Grill', kind: 'Clubhouse restaurant', where: 'Pacific Dunes clubhouse', phone: '(541) 347-8432', booking: '', hours: [], verified: false, menu: UP + '2024/08/Pacific-Grill-Dinner-Menu-8.26.24.pdf', menuNote: 'Dinner menu, Aug 2024' },
+  { id: 'trails-end', name: 'Trails End', kind: 'Pacific Rim plates', where: 'Bandon Trails / Preserve clubhouse', phone: '(541) 347-8431', booking: '', hours: [], verified: false, menu: DINING, menuNote: 'Current menus on the resort site' },
+  { id: 'sheep-ranch-club', name: 'Sheep Ranch Clubhouse', kind: 'Clubhouse food and drink', where: 'Sheep Ranch', phone: '(541) 347-8434', booking: '', hours: [], verified: false, menu: DINING, menuNote: 'Current menus on the resort site' },
+  { id: 'charlottes', name: "Charlotte's", kind: 'Quick bite before a round (may be closed for the season)', where: 'Practice Center', phone: '(541) 347-5778', booking: '', hours: [], verified: false, menu: UP + '2023/04/Charlottes-PC-Menu.pdf', menuNote: 'Menu, 2023' },
+  { id: 'shortys', name: "Shorty's", kind: 'Quick-serve street food', where: "Shorty's clubhouse", phone: '(541) 347-5881', booking: '', hours: [], verified: false, menu: UP + '2024/05/Shortys-Menu.pdf', menuNote: 'Menu, May 2024' },
+  { id: 'library', name: 'The Library Lounge', kind: 'Lounge at the Inn', where: 'The Inn', phone: '(541) 347-5277', booking: '', hours: [], verified: false, menu: UP + '2023/10/Library-Lounge-Menu-10.18.23.pdf', menuNote: 'Menu, Oct 2023' },
+  { id: 'bunker-bar', name: 'Bunker Bar', kind: 'Late-night bar', where: 'Main Lodge', phone: '(541) 347-5220', booking: '', hours: [], verified: false, menu: DINING, menuNote: 'Current menus on the resort site' },
+  { id: 'wheelhouse', name: 'The Wheelhouse', kind: 'Restaurant in Bandon (off resort)', where: '125 Chicago St, Old Town Bandon', phone: '(541) 347-9331', booking: 'Reservation (Marc)', hours: [], verified: false, menu: 'https://thewheelhouserestaurant.com/', menuNote: 'Restaurant website' },
 ];
 
 const rooms = [

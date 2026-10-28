@@ -118,6 +118,7 @@ export default function MyDay() {
             <div className="card" key={d.id}>
               <div className="round-top">{d.time && <span className="round-time">{fmtTime(d.time)}</span>}<span className="round-course">{d.restaurant}</span>{!d.time && <Pill>No reservation</Pill>}</div>
               {d.note && <p className="small">{d.note}</p>}
+              {restaurants.find((r) => r.name === d.restaurant)?.menu && <a className="small" href={restaurants.find((r) => r.name === d.restaurant).menu} target="_blank" rel="noreferrer">View menu</a>}
               {d.tables?.length > 0 && who && d.tables.some((tb) => tb.includes(who.id)) && <p className="small"><span className="label">Your table</span>{d.tables.find((tb) => tb.includes(who.id)).map((pid) => players[pid]?.initials).join(', ')}</p>}
               {(d.party || d.conf) && <p className="small muted">{d.party ? `Table for ${d.party}` : ''}{d.party && d.conf ? ' · ' : ''}{d.conf ? `Conf ${d.conf}` : ''}</p>}
             </div>

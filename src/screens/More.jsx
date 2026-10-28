@@ -47,6 +47,7 @@ export function Dining() {
             <div className="card" key={d.id}>
               <div className="round-top"><span className="round-time">{dayLabel(d.date)}{d.time ? ` · ${fmtTime(d.time)}` : ''}</span><span className="round-course">{d.restaurant}</span></div>
               {d.note && <p className="small">{d.note}</p>}
+              {restaurants.find((r) => r.name === d.restaurant)?.menu && <a className="small" href={restaurants.find((r) => r.name === d.restaurant).menu} target="_blank" rel="noreferrer">View menu</a>}
               {d.tables?.length > 0 && <div className="tables">{d.tables.map((tb, i) => <div key={i} className="small"><span className="label">Table {i + 1}</span>{tb.map((pid) => players[pid]?.initials).join(', ')}{d.tableNotes?.[i] ? <span className="muted"> · {d.tableNotes[i]}</span> : null}</div>)}</div>}
               {(d.party || d.conf || d.split) && <p className="small muted">{[d.party && `Table for ${d.party}`, d.conf && `Conf ${d.conf}`, d.split].filter(Boolean).join(' · ')}</p>}
             </div>
@@ -54,7 +55,7 @@ export function Dining() {
         })}
       </Section>
       <Section title="Restaurants">
-        <p className="note">Hours are from the resort website and need checking before Nov 1. All times Pacific.</p>
+        <p className="note">Menus open the latest version the resort has posted, so dishes and prices may have changed. Hours are from the resort website. All times Pacific.</p>
         <div className="rest-list">
           {restaurants.map((r) => {
             const os = openState(r.hours);
@@ -63,11 +64,12 @@ export function Dining() {
                 <div className="rest-top"><span className="rest-name">{r.name}</span><Pill tone={os.state === 'open' ? 'ok' : os.state === 'closing' ? 'warn' : 'neutral'}>{os.text}</Pill></div>
                 <div className="muted small">{[r.kind, r.where].filter(Boolean).join(' · ')}</div>
                 {r.hours?.length > 0 && <ul className="hours">{r.hours.map((h) => <li key={h.meal}><span>{h.meal}</span><span className="mono">{fmtTime(h.open)}–{fmtTime(h.close)}</span></li>)}</ul>}
-                <div className="small">{r.booking}{r.phone && <> · <CopyText text={r.phone} /></>}</div>
+                <div className="small">{r.booking}{r.booking && r.phone ? ' · ' : ''}{r.phone && <CopyText text={r.phone} />}</div>
                 <div className="row-wrap">
-                  {!r.verified && <Pill tone="warn">Verify hours</Pill>}
-                  <a className="small" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + ' Bandon Dunes')}`} target="_blank" rel="noreferrer">Map</a>
+                  {r.menu && <a className="btn primary small" href={r.menu} target="_blank" rel="noreferrer">View menu</a>}
+                  <a className="small" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.id === 'wheelhouse' ? 'Wheelhouse Restaurant 125 Chicago St Bandon OR' : r.name + ' Bandon Dunes')}`} target="_blank" rel="noreferrer">Map</a>
                 </div>
+                {r.menuNote && <div className="small muted">{r.menuNote}{!r.verified ? ' · hours to confirm' : ''}</div>}
               </div>
             );
           })}
