@@ -1,25 +1,27 @@
-/* Bandon Dunes look: resort green, puffin orange, warm cream paper, bold geometric caps headings
-   with an orange rule (as on the resort's own confirmations). */
+/* Puffin look: logo black and puffin yellow on warm white, bold geometric caps headings with a
+   yellow rule. Resort green survives only as a small accent (good news, stroke dots). */
 :root {
-  --bg: #f6f1e7;
-  --surface: #fffdf8;
-  --surface-2: #efe7d8;
-  --ink: #1b2420;
-  --ink-2: #5a615b;
-  --line: #e2d8c5;
-  --green: #006334;
-  --green-2: #0a7a44;
-  --orange: #cf8018;
-  --orange-2: #f89920;
-  --orange-ink: #a5620d;
+  --bg: #faf8f3;
+  --surface: #ffffff;
+  --surface-2: #f2eee5;
+  --ink: #231f20;
+  --ink-2: #5d5856;
+  --line: #e5dfd3;
+  --green: #231f20;        /* primary: logo black (name kept so existing rules follow it) */
+  --green-2: #8f5600;      /* links and secondary text: deep puffin amber, readable on white */
+  --orange: #f8991c;       /* puffin yellow */
+  --orange-2: #ffae3d;
+  --orange-ink: #8f5600;
   --on-accent: #ffffff;
-  --sand: #d9c9a3;
-  --sand-ink: #a5620d;
+  --on-yellow: #231f20;
+  --accent-green: #006334; /* resort green, accents only */
+  --sand: #e8dcc0;
+  --sand-ink: #8f5600;
   --dcbg: #2f6db0;
   --dcbg-soft: #e1eaf5;
   --jes: #d9a600;
   --jes-soft: #faf0c8;
-  --ok: #1f7a46;
+  --ok: #006334;
   --ok-soft: #dcefe0;
   --warn: #9a5a00;
   --warn-soft: #fbe9cc;
@@ -333,27 +335,37 @@ textarea { min-height: 80px; }
 .tables { display: flex; flex-direction: column; gap: 2px; }
 .team-strokes .big-num { font: 400 1.6rem/1 var(--f-display); color: var(--green); }
 
-/* ---- Bandon Dunes branding ---- */
-h1 { font: 700 1.9rem/1.08 var(--f-head); text-transform: uppercase; letter-spacing: 0.02em; color: var(--green); border-left: 4px solid var(--orange); padding-left: 12px; }
-h2 { font-family: var(--f-head); font-weight: 600; color: var(--green); letter-spacing: 0.1em; }
-.kicker { color: var(--orange-ink); font-family: var(--f-head); font-weight: 500; }
+/* ---- Puffin branding ---- */
+h1 { font: 700 1.9rem/1.08 var(--f-head); text-transform: uppercase; letter-spacing: 0.02em; color: var(--ink); border-left: 5px solid var(--orange); padding-left: 12px; }
+h2 { font-family: var(--f-head); font-weight: 600; color: var(--ink); letter-spacing: 0.1em; }
+.section-head { border-bottom: 2px solid var(--ink); }
+.kicker { color: var(--orange-ink); font-family: var(--f-head); font-weight: 600; }
 .brand-title { font: 700 2.3rem/1.02 var(--f-head); }
-.btn.primary { background: var(--orange); border-color: var(--orange); color: var(--on-accent); font-family: var(--f-head); text-transform: uppercase; letter-spacing: 0.06em; border-radius: 999px; }
 .btn { border-radius: 999px; }
+.btn.primary { background: var(--orange); border-color: var(--orange); color: var(--on-yellow); font-family: var(--f-head); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
 .btn.primary:hover { background: var(--orange-2); border-color: var(--orange-2); }
-.pill-accent { background: var(--green); color: var(--on-accent); }
-.day-chip.on, .chip.on { background: var(--green); border-color: var(--green); color: var(--on-accent); }
-.day-chip.on span { color: var(--on-accent); }
-.wx-card, .clinched { background: var(--green); color: var(--on-accent); border-left: 4px solid var(--orange-2); }
+.pill-accent { background: var(--ink); color: var(--orange); }
+.day-chip.on, .chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.day-chip.on span { color: var(--orange); opacity: 1; }
+.wx-card, .clinched { background: var(--ink); color: #fff; border-left: 5px solid var(--orange); }
+.wx-temp { color: var(--orange); }
 .board-pts { font: 700 3.2rem/1 var(--f-head); }
-.tab.on { color: var(--green); }
-.tab.on svg { stroke: var(--orange); }
+.tab.on { color: var(--ink); }
+.tab.on svg { stroke: var(--orange); stroke-width: 2.4; }
+.tabbar { border-top: 2px solid var(--ink); }
 .link-btn, .back, a { color: var(--green-2); }
-.mark { background: var(--green); }
-.mark::after { background: var(--orange-2); }
 .menu-title { font-family: var(--f-head); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.95rem; }
-.round-time, .tee-when .mono { color: var(--green); }
-.notice { background: var(--surface-2); border-left: 4px solid var(--orange); }
-.seg button.on { color: var(--green); }
+.round-time, .tee-when .mono { color: var(--ink); }
+.round.card, .tee.mine, .is-me-card { border-color: var(--line); }
+.tee.mine, .round { border-left: 4px solid var(--orange); }
+.notice { background: #fff4e0; border-left: 5px solid var(--orange); }
+.seg button.on { color: var(--ink); box-shadow: inset 0 -3px 0 var(--orange), var(--shadow); }
+.who.is-me { outline-color: var(--orange); outline-width: 2px; }
+.me-row { background: #fff4e0; }
+.stroke-dots { color: var(--accent-green); }
+.team-strokes .big-num, .round-result { color: var(--accent-green); }
+.course-name { color: var(--ink); }
+.hcp { color: var(--ink); }
+.pill-ok { background: var(--ok-soft); color: var(--accent-green); }
+.board-team.leading { box-shadow: inset 0 0 0 2px var(--ink); }
 @media (max-width: 420px) { h1 { font-size: 1.6rem; } .board-pts { font-size: 2.7rem; } }
-
