@@ -99,7 +99,7 @@ export function Caddies() {
         <div className="table-wrap"><table className="grid">
           <thead><tr><th>Player</th><th className="num">Rounds with caddie</th><th className="num">Total</th></tr></thead>
           <tbody>
-            {Object.values(players).sort((a, b) => a.name.localeCompare(b.name)).map((p) => (
+            {Object.values(players).filter((p) => !p.guest).sort((a, b) => a.name.localeCompare(b.name)).map((p) => (
               <tr key={p.id} className={me?.id === p.id ? 'me-row' : ''}><td><Who pid={p.id} players={players} me={me} /> <span className="small">{p.name}</span></td><td className="num">{counts[p.id] || 0}</td><td className="num">${((counts[p.id] || 0) * rate).toLocaleString()}</td></tr>
             ))}
             <tr className="total-row"><td>Group</td><td className="num">{total}</td><td className="num">${(total * rate).toLocaleString()}</td></tr>
@@ -154,7 +154,7 @@ export function Lodging() {
       </Section>
       <Section title="Sunday night, Nov 1">
         <p className="note">Not at the resort. Most of the group is at the Bandon Inn in town.</p>
-        <ul className="plain-list">{Object.values(players).filter((p) => p.id !== 'aw').map((p) => <li key={p.id}><Who pid={p.id} players={players} me={me} /> <span className="small">{p.sundayLodging || '—'}</span></li>)}</ul>
+        <ul className="plain-list">{Object.values(players).filter((p) => p.id !== 'aw' && !p.guest).map((p) => <li key={p.id}><Who pid={p.id} players={players} me={me} /> <span className="small">{p.sundayLodging || '—'}</span></li>)}</ul>
       </Section>
     </div>
   );
@@ -179,7 +179,7 @@ export function Players() {
                     <span className="player-name">{p.name}</span>
                     <span className="mono hcp">{p.index ?? '—'}</span>
                   </div>
-                  <div className="small muted">{[p.initials, p.captain && 'Co-captain', p.id === 'aw' && 'From Wednesday', p.homeClub].filter(Boolean).join(' · ')}</div>
+                  <div className="small muted">{[p.initials, p.captain && 'Co-captain', p.id === 'aw' && 'From Wednesday', p.guest && 'Tuesday practice round only', p.homeClub].filter(Boolean).join(' · ')}</div>
                   <div className="small">{p.ghin ? <>GHIN <span className="mono">{p.ghin}</span> · <a href="https://www.ghin.com/" target="_blank" rel="noreferrer">GHIN</a></> : <span className="muted">No GHIN # yet</span>}{p.tee && <> · Tees: {p.tee}</>}</div>
                 </div>
               )

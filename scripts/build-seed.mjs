@@ -17,13 +17,14 @@ const players = [
   P('sc', 'Steve Cook', 'SC', 'JES', ['swcook522@gmail.com']),
   P('ap', 'Austin Piephoff', 'AP', 'JES', ['Austinpiephoff@hotmail.com']),
   P('mt', 'Marc Tardif', 'MT', 'JES', ['mtardif@gmail.com']),
-  P('court', 'Court Lanio', 'CL', 'JES', ['court.lanio@gmail.com']),
+  P('court', 'Court Lanio', 'Court', 'JES', ['court.lanio@gmail.com']),
   P('ms', 'Marc Schoenecker', 'MS', 'DCBG', ['marc.schoenecker@verizon.com', 'marcschoenecker@yahoo.com'], { captain: true, role: 'admin' }),
   P('aw', 'Adam Whitehead', 'AW', 'DCBG', [], { homeClub: 'Las Colinas Country Club, Irving, TX', activeFrom: '2026-11-04', notes: 'Email, GHIN # and co-captain status TBD.' }),
   P('gn', 'Greg Noschese', 'GN', 'DCBG', ['gnoschese@munsch.com'], { captain: true }),
   P('rw', 'Rick Wiley', 'RW', 'DCBG', ['rick.wiley@verizon.net']),
   P('joel', 'Joel Schoenecker', 'Joel', 'DCBG', ['jschoe0309@gmail.com']),
   P('jon', 'Bonnie Jon Schoenecker', 'Bonnie Jon', 'DCBG', ['getjon62@gmail.com'], { nickname: 'Bonnie Jon' }),
+  P('cl', 'Craig Lilly', 'CL', 'DCBG', [], { guest: true, activeTo: '2026-11-03', notes: 'Tuesday practice round only. Not in the Shoe.' }),
 ];
 
 // Handicap Index from Marc's final sheet (Oct 19, 2026 GHIN).
@@ -42,11 +43,11 @@ const T = (id, date, time, course, session, kind, list, extra = {}) => ({
 
 const teeTimes = [
   T('tue-1200-bt', '2026-11-03', '12:00', 'bandon-trails', null, 'casual', [['mp'], ['mt'], ['josh'], ['court']]),
-  T('tue-1200-bd', '2026-11-03', '12:00', 'bandon-dunes', null, 'casual', [['ms'], ['jon'], ['joel']]),
+  T('tue-1200-bd', '2026-11-03', '12:00', 'bandon-dunes', null, 'casual', [['ms'], ['cl'], ['jon'], ['joel']]),
   T('tue-1210-sr', '2026-11-03', '12:10', 'sheep-ranch', null, 'casual', [['gn'], ['rw'], ['sc'], ['ap']]),
 
   T('wed-0720-sr', '2026-11-04', '07:20', 'sheep-ranch', 'wed-am', 'match', [['ms', SD], ['rw', SD], ['sc', BJ], ['mp', BJ]], { paceSetter: true, teamStrokes: { team: 'JES', strokes: 2.5, calc: 'MS/RW 3 + 2.4 = 5.4 · SC/MP 4.2 + 3.6 = 7.8' } }),
-  T('wed-0730-sr', '2026-11-04', '07:30', 'sheep-ranch', 'wed-am', 'match', [['gn', PK], ['aw', PK], ['josh', BH], ['court', BH]], { paceSetter: true, teamStrokes: { team: 'JES', strokes: 2, calc: 'GN/AW 0.6 + 3.2 = 3.8 · Josh/CL 3 + 2.8 = 5.8' } }),
+  T('wed-0730-sr', '2026-11-04', '07:30', 'sheep-ranch', 'wed-am', 'match', [['gn', PK], ['aw', PK], ['josh', BH], ['court', BH]], { paceSetter: true, teamStrokes: { team: 'JES', strokes: 2, calc: 'GN/AW 0.6 + 3.2 = 3.8 · Josh/Court 3 + 2.8 = 5.8' } }),
   T('wed-0740-sr', '2026-11-04', '07:40', 'sheep-ranch', 'wed-am', 'match', [['joel'], ['jon'], ['mt', JJ], ['ap']], { paceSetter: true, teamStrokes: { team: 'DCBG', strokes: 7, calc: 'Joel/Bonnie Jon 4.8 + 7.6 = 12.4 · AP/MT 2.4 + 3.2 = 5.6' } }),
   T('wed-1220-bd', '2026-11-04', '12:20', 'bandon-dunes', 'wed-pm', 'match', [['ms', SD], ['aw', SD], ['mt', BH], ['josh', BH]]),
   T('wed-1220-pd', '2026-11-04', '12:20', 'pacific-dunes', 'wed-pm', 'match', [['gn', PK], ['joel'], ['sc', PK], ['ap']]),
@@ -154,7 +155,7 @@ const settings = [{
 
 const dinners = [
   { id: 'd-mon', date: '2026-11-02', time: '', restaurant: "McKee's Pub", party: '', conf: '', split: '', note: 'No reservation. Marc is walking over for dinner by the fireplace; all welcome.', tables: [] },
-  { id: 'd-tue', date: '2026-11-03', time: '19:00', restaurant: 'Ghost Tree Grill', party: 12, conf: '', split: '', note: 'Three tables.', tables: [['ms', 'ap', 'joel', 'jon'], ['court', 'josh', 'mp', 'mt'], ['rw', 'gn', 'sc', 'aw']], tableNotes: ['Plus a guest at this table'] },
+  { id: 'd-tue', date: '2026-11-03', time: '19:00', restaurant: 'Ghost Tree Grill', party: 12, conf: '', split: '', note: 'Three tables.', tables: [['ms', 'cl', 'ap', 'joel', 'jon'], ['court', 'josh', 'mp', 'mt'], ['rw', 'gn', 'sc', 'aw']] },
   { id: 'd-wed', date: '2026-11-04', time: '', restaurant: "McKee's Pub", party: '', conf: '', split: '', note: 'No reservation. Several will eat by the McKee’s fireplace; some may have pizza delivered to the library bar at the Inn.', tables: [] },
   { id: 'd-thu', date: '2026-11-05', time: '17:30', restaurant: 'Pacific Grill', party: 12, conf: '', split: '', note: 'Three tables of 4, no assigned seating.', tables: [] },
   { id: 'd-fri', date: '2026-11-06', time: '19:00', restaurant: 'The Wheelhouse', party: 12, conf: '', split: '', note: 'Upstairs, in town. Saturday singles matches are set at this dinner. Also a table downstairs for Dave, Kelly, Liam and Alivia.', tables: [] },

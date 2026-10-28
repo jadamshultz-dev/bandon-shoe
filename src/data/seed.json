@@ -103,7 +103,7 @@
     {
       "id": "court",
       "name": "Court Lanio",
-      "initials": "CL",
+      "initials": "Court",
       "team": "JES",
       "role": "player",
       "captain": false,
@@ -240,6 +240,27 @@
       "dietary": "",
       "notes": "",
       "nickname": "Bonnie Jon"
+    },
+    {
+      "id": "cl",
+      "name": "Craig Lilly",
+      "initials": "CL",
+      "team": "DCBG",
+      "role": "player",
+      "captain": false,
+      "index": null,
+      "ghin": "",
+      "tee": "Green",
+      "phone": "",
+      "homeClub": "",
+      "activeFrom": "2026-11-02",
+      "activeTo": "2026-11-03",
+      "sundayLodging": "Bandon Inn",
+      "flightIn": "",
+      "flightOut": "",
+      "dietary": "",
+      "notes": "Tuesday practice round only. Not in the Shoe.",
+      "guest": true
     }
   ],
   "tee_times": [
@@ -274,11 +295,13 @@
       "kind": "casual",
       "players": [
         "ms",
+        "cl",
         "jon",
         "joel"
       ],
       "caddies": {
         "ms": null,
+        "cl": null,
         "jon": null,
         "joel": null
       },
@@ -358,7 +381,7 @@
       "teamStrokes": {
         "team": "JES",
         "strokes": 2,
-        "calc": "GN/AW 0.6 + 3.2 = 3.8 · Josh/CL 3 + 2.8 = 5.8"
+        "calc": "GN/AW 0.6 + 3.2 = 3.8 · Josh/Court 3 + 2.8 = 5.8"
       }
     },
     {
@@ -2618,6 +2641,7 @@
       "tables": [
         [
           "ms",
+          "cl",
           "ap",
           "joel",
           "jon"
@@ -2634,9 +2658,6 @@
           "sc",
           "aw"
         ]
-      ],
-      "tableNotes": [
-        "Plus a guest at this table"
       ]
     },
     {

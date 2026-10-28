@@ -83,7 +83,7 @@ export default function Leaderboard() {
           <table className="grid">
             <thead><tr><th>Player</th><th className="num">W</th><th className="num">L</th><th className="num">H</th><th className="num">Pts</th></tr></thead>
             <tbody>
-              {Object.values(players).sort((a, b) => (rec[b.id]?.pts || 0) - (rec[a.id]?.pts || 0) || a.name.localeCompare(b.name)).map((p) => {
+              {Object.values(players).filter((p) => !p.guest).sort((a, b) => (rec[b.id]?.pts || 0) - (rec[a.id]?.pts || 0) || a.name.localeCompare(b.name)).map((p) => {
                 const r = rec[p.id] || { w: 0, l: 0, h: 0, pts: 0 };
                 return <tr key={p.id} className={me?.id === p.id ? 'me-row' : ''}><td><Who pid={p.id} players={players} me={me} /> <span className="small">{p.name}</span></td><td className="num">{r.w}</td><td className="num">{r.l}</td><td className="num">{r.h}</td><td className="num strong">{fmt(r.pts)}</td></tr>;
               })}

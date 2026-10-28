@@ -107,7 +107,7 @@ function NamePicker() {
           <div className="pick-grid">
             {players.filter((p) => p.team === team).map((p) => (
               <button key={p.id} className="pick" onClick={() => { choosePlayer(p.id); go('myday'); }}>
-                <span>{p.name}</span>
+                <span>{p.name}{p.guest && <span className="muted small"> · Tue only</span>}</span>
               </button>
             ))}
           </div>
