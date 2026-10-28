@@ -6,7 +6,6 @@ import Schedule from './screens/Schedule.jsx';
 import MatchCard from './screens/MatchCard.jsx';
 import Courses, { CourseDetail } from './screens/Courses.jsx';
 import More, { Caddies, Dining, Info, Lodging, MapScreen, Players } from './screens/More.jsx';
-import Admin, { PairingEditor, ScoreEntry } from './screens/Admin.jsx';
 import { TeamDot, go } from './ui.jsx';
 
 function useHash() {
@@ -29,17 +28,14 @@ const TABS = [
 ];
 
 function tabFor(route) {
-  if (route.startsWith('match-') || route.startsWith('edit-')) return 'schedule';
+  if (route.startsWith('match-')) return 'schedule';
   if (route.startsWith('course-')) return 'courses';
-  if (route.startsWith('score-')) return 'more';
   if (TABS.some(([k]) => k === route)) return route;
   return 'more';
 }
 
 function Screen({ route }) {
   if (route.startsWith('match-')) return <MatchCard id={route.slice(6)} />;
-  if (route.startsWith('score-')) return <ScoreEntry id={route.slice(6)} />;
-  if (route.startsWith('edit-')) return <PairingEditor id={route.slice(5)} />;
   if (route.startsWith('course-')) return <CourseDetail id={route.slice(7)} />;
   switch (route) {
     case 'leaders': return <Leaderboard />;
@@ -52,7 +48,6 @@ function Screen({ route }) {
     case 'players': return <Players />;
     case 'map': return <MapScreen />;
     case 'info': return <Info />;
-    case 'admin': return <Admin />;
     default: return <MyDay />;
   }
 }
@@ -60,20 +55,19 @@ function Screen({ route }) {
 export default function App() {
   const store = useStore();
   const route = useHash();
-  const { ready, me, online, queue, toast } = store;
+  const { ready, me, online, toast } = store;
 
   let body;
   if (!ready) body = <div className="center-screen"><p className="muted">Loading the tee sheet…</p></div>;
   else if (!me) body = <NamePicker />;
   else body = null;
 
-  if (body) return <div className="app">{store.loadError && <div className="load-error"><b>Showing built-in data.</b> {store.loadError} <span className="muted">· {store.supaHost}</span></div>}{body}{toast && <div className={`toast ${toast.tone}`} role="status">{toast.text}</div>}</div>;
+  if (body) return <div className="app">{body}{toast && <div className={`toast ${toast.tone}`} role="status">{toast.text}</div>}</div>;
 
   const tab = tabFor(route);
   return (
     <div className="app">
-      {store.loadError && <div className="load-error"><b>Showing built-in data.</b> {store.loadError} <span className="muted">· {store.supaHost}</span></div>}
-      {(!online || queue.length > 0) && <div className="offline">{!online ? 'No signal. Showing saved data.' : ''}{queue.length > 0 ? ` ${queue.length} change${queue.length === 1 ? '' : 's'} waiting to sync.` : ''}</div>}
+      {!online && <div className="offline">No signal. Showing the last version you opened.</div>}
       <main className="main"><Screen route={route} /></main>
       <nav className="tabbar" aria-label="Main">
         {TABS.map(([k, label, d]) => (
@@ -100,7 +94,7 @@ function Brand() {
 }
 
 function NamePicker() {
-  const { list, choosePlayer, mode } = useStore();
+  const { list, choosePlayer } = useStore();
   const players = list('players').sort((a, b) => a.team.localeCompare(b.team) || a.name.localeCompare(b.name));
   return (
     <div className="signin">
@@ -119,7 +113,6 @@ function NamePicker() {
           </div>
         </div>
       ))}
-      {mode === 'demo' && <p className="small muted">Demo mode: changes stay on this device.</p>}
     </div>
   );
 }

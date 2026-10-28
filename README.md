@@ -1,88 +1,48 @@
 # Halcyon Days Bandon Shoe — trip app
 
-A private, phone-first web app for the 2026 Bandon Dunes trip (Nov 1–8). It runs the Shoe (live leaderboard, match cards with strokes by hole, result entry for Marc and Josh) and carries the trip binder: tee sheet, caddies, courses, dining, lodging, travel and resort info.
+A phone-first web app for the 2026 Bandon Dunes trip (Nov 3–7). Each golfer opens the link, taps his name, and sees his day: tee times, partners, opponents, strokes by hole, caddie and dinner. Everyone sees the live leaderboard, the full tee sheet, courses, dining and the Shoe rules.
 
-- **Hosting:** Netlify, deployed from this GitHub repo
-- **Database and live updates:** Supabase (free tier is plenty)
-- **No sign-in:** each golfer opens the link and taps his name. The phone remembers him; "Not you? Switch golfer" is on My Day and More.
-- **Offline:** the app keeps the last data it loaded, and admin edits made without signal sync when it returns
+**Live site:** https://bandon-shoe.netlify.app
 
-## What's loaded already
+## How it stays up to date
 
-Everything in `src/data/seed.json` (built by `scripts/build-seed.mjs`):
+The app is read-only. There's no database, no sign-in and no admin screens.
 
-- 13 profiles: the 12-man roster plus Craig Lilly for Mon–Tue. Adam Whitehead takes Craig's DCBG spot from Wednesday.
-- Tee times Tuesday through Saturday with every group and caddie from Marc's sheet. Saturday groups are blank except MS.
-- Admins: Marc Schoenecker, Josh Shultz and Mike Prawdzik. Their tools unlock with the admin PIN (see below).
-- Handicap Index for all 12 players (Oct 19 GHIN) and Marc's playing handicaps by course. SC, RW and Bonnie Jon play the Gold tees; everyone else Green.
-- Shoe format: Wed AM Scotch foursomes (Marc's team strokes), Wed PM–Fri PM four-ball at 80%, Saturday singles at 100% (four matches per group, set at Friday dinner). 27 points; 14 wins. Equitable adjustment after each round (−1 for a win, +1 for a loss) is applied automatically.
-- Dinners from Marc's itinerary and the Shoe local rules (Resort info page).
-- 1 point per match, ½ each for a halve, $160 per player per round for caddies.
-- Six courses, eight restaurants (hours marked "verify"), ten rooms, the church van legs and the rental car.
-- Thursday Preserve RSVPs from the sheet.
+1. Marc hands Josh the signed scorecards.
+2. Josh snaps a photo and sends it to Claude.
+3. Claude records the results, commits to this repo and pushes.
+4. Netlify republishes in a minute or two. Phones pick up the new version when the app is reopened or brought back to the foreground.
 
-Course ratings, slopes, pars and stroke indexes are **not** loaded. Enter them from the official scorecards under Courses → Edit scorecard (there's a quick-fill box for pasting a whole par or handicap row). Until then, match cards show the stroke count but not the stroke holes.
+The same goes for any other change: caddie swaps, Saturday singles groups, dinner changes, wording. Josh asks Claude; Claude edits the files and pushes.
 
-## Set it up (about 20 minutes)
+The paper scorecard is always the official record.
 
-### 1. Supabase
-1. Create a project at supabase.com.
-2. SQL editor → open `supabase/schema.sql`, change the admin PIN at the bottom (`CHANGE-ME-ADMIN`) to your own (the caddie PIN is spare; change it too or leave it), then run it.
-3. Run `supabase/seed.sql`.
-4. Project Settings → API: copy the **Project URL** and the **anon public** key.
+## Where the data lives
 
-### 2. GitHub
-Push this folder to a new private repo.
-
-### 3. Netlify
-1. Add new site → Import from GitHub → pick the repo. Build command and publish folder come from `netlify.toml`.
-2. Site configuration → Environment variables: add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
-3. Deploy, then text the link to the group. Each golfer taps his name.
-
-## Admin links for Marc, Josh and Mike
-
-Instead of typing a PIN, each admin taps a private link once:
-
-`https://YOUR-SITE.netlify.app/?admin=YOUR-ADMIN-PIN`
-
-The app saves the code on that phone, removes it from the address bar, and unlocks the admin tools as soon as he taps his name. Send the link to each admin directly, never to the group thread: anyone who has it gets scoring rights. If it leaks, change the admin PIN in Supabase (see below) and send new links; old links stop working and say so.
-
-iPhone: open the admin link in Safari, then Share → Add to Home Screen from that page, so the home-screen app starts unlocked. (Safari and home-screen apps keep separate storage.)
-
-Typing the PIN under More → Unlock still works as a backup.
-
-## PINs and who can change what
-
-There's no sign-in, so anyone with the link can open the app and pick any name. Keep the link to the group. The PINs keep the scoring safe:
-
-| Who | Can change | How |
+| File | What's in it | How it changes |
 |---|---|---|
-| Marc, Josh, Mike | Everything: results, pairings, handicaps, settings, courses, dinners, rooms, announcements. Undo any change from Admin → Audit log. | Pick your name, then More → enter the **admin PIN** once on that phone |
-| Every golfer | His own RSVPs (dinners, Preserve, van seat) and his profile details (GHIN #, tees, phone, flights, Sunday lodging) | Nothing to unlock |
+| `src/data/results.json` | Every posted match result and a last-updated time | `node scripts/results.mjs post <match-id> <DCBG\|JES\|halved> [margin]` |
+| `scripts/build-seed.mjs` | Players, handicaps, tees, tee times, groups, caddies, dinners, rules, Marc's playing handicaps | Edit, then `npm run seed` to rebuild `src/data/seed.json` |
+| `scripts/scorecards.mjs` | Par, stroke index, yardage, rating and slope for each course (from GolfPass; not yet checked against the resort's cards) | Edit, then `npm run seed` |
 
-The database enforces the PIN rules, not just the app. Names, teams and Handicap Index can only be changed with the admin PIN. Every change is logged with the initials of whoever made it.
+`node scripts/results.mjs list` shows every match id with its players and any posted result. Saturday singles ids (for example `sat-0930-bd~ms~josh`) appear once the Saturday groups are filled in `build-seed.mjs`.
 
-To change a PIN later, run in the SQL editor: `update public.app_secrets set value = 'new-pin' where key = 'admin_pin';`
+## What the app works out on its own
 
-## Posting a result
+- Strokes for every match, by format: Scotch foursomes uses Marc's team strokes (a half stroke wins its hole on a tie); four-ball at 80% and singles at 100% use Marc's playing handicaps by course, off the low man.
+- The equitable adjustment: −1 to a player's handicap for each Shoe match he wins, +1 for each loss, applied to his later sessions.
+- Team points (27 in all, 14 to win), session totals, player records and the clinch banner.
 
-Paper card → Marc checks it → Josh (or Marc) opens Admin → Results → the match → picks the winner and margin → ticks **Scorecard verified by MS** → Review → Post. The leaderboard updates on every phone within a second or two.
+## Hosting
 
-## Strokes
+GitHub (`jadamshultz-dev/bandon-shoe`) → Netlify. Every push to `main` deploys. Netlify needs no environment variables.
 
-Course Handicap = Index × Slope ÷ 113 + (Course Rating − Par), rounded. Playing handicap = Course Handicap × allowance (90% unless a session sets its own). The low man in the match plays off zero; the others get the difference, on the holes with the lowest stroke index. Admins can add or take away a stroke for any player in a specific match from the match card.
-
-## GHIN
-
-Handicap Index is entered by hand by an admin under Admin → Handicaps. The USGA only allows automatic GHIN lookups through its approved developer programs, so the app stores each GHIN number and links to GHIN rather than pulling indexes itself.
+Save to the home screen: on iPhone, open the link in Safari → Share → Add to Home Screen. On Android, open it in Chrome → ⋮ → Add to Home screen.
 
 ## Local development
 
 ```
 npm install
-cp .env.example .env.local   # or set VITE_DEMO=1 to run with sample data, no sign-in
 npm run dev
-npm test                     # handicap and standings math
+npm test        # handicap, strokes and standings math
 ```
-
-To change the starting data, edit `scripts/build-seed.mjs`, then `npm run seed` and re-run `supabase/seed.sql` (it skips rows that already exist; run `node scripts/gen-seed-sql.mjs --overwrite` to replace them).

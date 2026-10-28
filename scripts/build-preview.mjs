@@ -1,4 +1,4 @@
-// Builds a single-file demo of the app (no Supabase) for a quick look. Run with: bun scripts/build-preview.mjs <outdir>
+// Builds a single-file copy of the app for a quick look outside Netlify. Run with: bun scripts/build-preview.mjs <outdir>
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 const out = process.argv[2] || 'preview';
@@ -8,9 +8,7 @@ const res = await Bun.build({
   minify: true,
   target: 'browser',
   format: 'esm',
-  external: ['@supabase/supabase-js'],
   define: { 'process.env.NODE_ENV': '"production"' },
-  plugins: [{ name: 'demo-env', setup(b) { b.onResolve({ filter: /lib\/env\.js$|\.\/env\.js$/ }, (a) => ({ path: join(process.cwd(), 'src/lib/env.demo.js') })); } }],
 });
 if (!res.success) { console.error(res.logs); process.exit(1); }
 const files = readdirSync(out);

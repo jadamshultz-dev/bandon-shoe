@@ -8,10 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node scripts/test-golf.mjs",
-    "seed": "node scripts/build-seed.mjs && node scripts/gen-seed-sql.mjs"
+    "seed": "node scripts/build-seed.mjs",
+    "results": "node scripts/results.mjs"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
@@ -19,5 +19,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^6.0.0"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

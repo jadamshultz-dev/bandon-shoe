@@ -1,5 +1,5 @@
 // Builds src/data/seed.json — the starting data for the app and the Supabase seed.
-// Edit here, then run: node scripts/build-seed.mjs && npm run seed:sql
+// Edit here, then run: npm run seed
 import { writeFileSync } from 'node:fs';
 import { applyScorecard } from './scorecards.mjs';
 
@@ -166,7 +166,7 @@ const rsvps = [
 ];
 
 const announcements = [
-  { id: 'a1', at: '2026-10-19T17:30:00-07:00', by: 'ms', pinned: true, text: 'Final pairings, caddies and handicaps are loaded. 27 points in the Shoe; 14 wins it. Saturday singles are set at Friday dinner.' },
+  { id: 'a1', at: '2026-10-19T17:30:00-07:00', by: 'ms', pinned: true, text: 'Final pairings, caddies and handicaps are loaded. Results go up after Marc checks each card. 27 points in the Shoe; 14 wins it.' },
 ];
 
 const seed = { players, tee_times: teeTimes, courses, restaurants, rooms, rides, settings, rsvps, announcements, dinners, results: [] };

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useStore } from '../lib/store.jsx';
 import { dayLabel, fmtTime, openState } from '../lib/time.js';
-import { Back, CopyText, Empty, Field, PageHead, Pill, Section, TeamDot, Who, go, teamName, useLookups } from '../ui.jsx';
+import { Back, CopyText, Empty, PageHead, Pill, Section, TeamDot, Who, go, teamName, useLookups } from '../ui.jsx';
 
 const MENU = [
   ['dining', 'Dining', 'Restaurants, hours and group dinners'],
@@ -13,51 +13,35 @@ const MENU = [
 ];
 
 export default function More() {
-  const { isAdmin, canCaddie, me, switchPlayer, mode, resetDemo, needsPin } = useStore();
+  const { me, switchPlayer, updated } = useStore();
   return (
     <div className="page">
       <PageHead kicker={me ? `You're ${me.name}` : ''} title="More" />
-      {needsPin && <UnlockCard />}
       <nav className="menu">
         {MENU.map(([h, t, s]) => <button key={h} className="menu-item" onClick={() => go(h)}><span className="menu-title">{t}</span><span className="muted small">{s}</span></button>)}
-        {isAdmin && <button className="menu-item admin" onClick={() => go('admin')}><span className="menu-title">Admin</span><span className="muted small">Post results, edit settings, handicaps and the audit log</span></button>}
       </nav>
       <div className="actions">
         <button className="btn" onClick={() => { switchPlayer(); go('myday'); }}>Not {me?.nickname || me?.name?.split(' ')[0]}? Switch golfer</button>
-        {mode === 'demo' && <button className="btn" onClick={resetDemo}>Reset demo data</button>}
       </div>
+      {updated && <p className="small muted">App last updated {new Date(updated).toLocaleString('en-US', { timeZone: 'America/Los_Angeles', weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })} Pacific. Results and changes come from Josh.</p>}
     </div>
   );
 }
 
 // ---------------- Dining ----------------
 export function Dining() {
-  const { list, isAdmin, save, remove, me } = useStore();
+  const { list } = useStore();
   const { players } = useLookups();
   const restaurants = list('restaurants');
   const dinners = list('dinners').sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-  const rsvps = list('rsvps');
-  const [draft, setDraft] = useState(null);
-  const [editR, setEditR] = useState(null);
   return (
     <div className="page">
       <Back />
       <PageHead kicker="On the resort" title="Dining">
         <p className="small">Restaurants keep a one-check policy for parties of 8 or more. Dinner reservations open 6 months ahead.</p>
       </PageHead>
-      <Section title="Group dinners" aside={isAdmin && <button className="link-btn" onClick={() => setDraft({ id: `d${Date.now()}`, date: '2026-11-03', time: '19:00', restaurant: restaurants[0]?.name || '', party: 12, conf: '', paidBy: '', split: '' })}>Add dinner</button>}>
-        {draft && (
-          <div className="card form">
-            <Field label="Night"><select id="dn-date" value={draft.date} onChange={(e) => setDraft({ ...draft, date: e.target.value })}>{['2026-11-03', '2026-11-04', '2026-11-05', '2026-11-06', '2026-11-07'].map((d) => <option key={d} value={d}>{dayLabel(d)}</option>)}</select></Field>
-            <Field label="Time"><input id="dn-time" type="time" value={draft.time} onChange={(e) => setDraft({ ...draft, time: e.target.value })} /></Field>
-            <Field label="Restaurant"><input id="dn-rest" list="rest-names" value={draft.restaurant} onChange={(e) => setDraft({ ...draft, restaurant: e.target.value })} /><datalist id="rest-names">{restaurants.map((r) => <option key={r.id} value={r.name} />)}</datalist></Field>
-            <Field label="Party size"><input id="dn-party" inputMode="numeric" value={draft.party} onChange={(e) => setDraft({ ...draft, party: e.target.value })} /></Field>
-            <Field label="Confirmation #"><input id="dn-conf" value={draft.conf} onChange={(e) => setDraft({ ...draft, conf: e.target.value })} /></Field>
-            <Field label="Who paid / how to split"><input id="dn-paid" value={draft.split} onChange={(e) => setDraft({ ...draft, split: e.target.value })} /></Field>
-            <div className="actions"><button className="btn primary" onClick={() => { save('dinners', draft); setDraft(null); }}>Save dinner</button><button className="btn" onClick={() => setDraft(null)}>Cancel</button></div>
-          </div>
-        )}
-        {dinners.length === 0 && !draft && <Empty>No group dinners booked yet. Marc will add them here.</Empty>}
+      <Section title="Group dinners">
+        {dinners.length === 0 && <Empty>No group dinners booked yet. Marc will add them here.</Empty>}
         {dinners.map((d) => {
           return (
             <div className="card" key={d.id}>
@@ -65,7 +49,6 @@ export function Dining() {
               {d.note && <p className="small">{d.note}</p>}
               {d.tables?.length > 0 && <div className="tables">{d.tables.map((tb, i) => <div key={i} className="small"><span className="label">Table {i + 1}</span>{tb.map((pid) => players[pid]?.initials).join(', ')}{d.tableNotes?.[i] ? <span className="muted"> · {d.tableNotes[i]}</span> : null}</div>)}</div>}
               {(d.party || d.conf || d.split) && <p className="small muted">{[d.party && `Table for ${d.party}`, d.conf && `Conf ${d.conf}`, d.split].filter(Boolean).join(' · ')}</p>}
-              {isAdmin && <div className="actions"><button className="link-btn" onClick={() => setDraft(d)}>Edit</button><button className="link-btn danger" onClick={() => remove('dinners', d.id)}>Delete</button></div>}
             </div>
           );
         })}
@@ -75,7 +58,6 @@ export function Dining() {
         <div className="rest-list">
           {restaurants.map((r) => {
             const os = openState(r.hours);
-            if (editR?.id === r.id) return <RestaurantEditor key={r.id} r={editR} setR={setEditR} onSave={() => { save('restaurants', editR); setEditR(null); }} />;
             return (
               <div className="card rest" key={r.id}>
                 <div className="rest-top"><span className="rest-name">{r.name}</span><Pill tone={os.state === 'open' ? 'ok' : os.state === 'closing' ? 'warn' : 'neutral'}>{os.text}</Pill></div>
@@ -85,36 +67,12 @@ export function Dining() {
                 <div className="row-wrap">
                   {!r.verified && <Pill tone="warn">Verify hours</Pill>}
                   <a className="small" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.name + ' Bandon Dunes')}`} target="_blank" rel="noreferrer">Map</a>
-                  {isAdmin && <button className="link-btn" onClick={() => setEditR(JSON.parse(JSON.stringify(r)))}>Edit</button>}
                 </div>
               </div>
             );
           })}
         </div>
       </Section>
-    </div>
-  );
-}
-
-function RestaurantEditor({ r, setR, onSave }) {
-  const setH = (i, k, v) => setR({ ...r, hours: r.hours.map((h, j) => (j === i ? { ...h, [k]: v } : h)) });
-  return (
-    <div className="card form">
-      <Field label="Name"><input id={`rn-${r.id}`} value={r.name} onChange={(e) => setR({ ...r, name: e.target.value })} /></Field>
-      <Field label="Where"><input id={`rw-${r.id}`} value={r.where} onChange={(e) => setR({ ...r, where: e.target.value })} /></Field>
-      <Field label="Phone"><input id={`rp-${r.id}`} value={r.phone} onChange={(e) => setR({ ...r, phone: e.target.value })} /></Field>
-      <Field label="Booking"><input id={`rb-${r.id}`} value={r.booking} onChange={(e) => setR({ ...r, booking: e.target.value })} /></Field>
-      {r.hours.map((h, i) => (
-        <div className="inline" key={i}>
-          <input id={`rh-${r.id}-${i}-m`} value={h.meal} onChange={(e) => setH(i, 'meal', e.target.value)} aria-label="Meal" />
-          <input id={`rh-${r.id}-${i}-o`} type="time" value={h.open} onChange={(e) => setH(i, 'open', e.target.value)} aria-label="Opens" />
-          <input id={`rh-${r.id}-${i}-c`} type="time" value={h.close} onChange={(e) => setH(i, 'close', e.target.value)} aria-label="Closes" />
-          <button className="link-btn danger" onClick={() => setR({ ...r, hours: r.hours.filter((_, j) => j !== i) })}>Remove</button>
-        </div>
-      ))}
-      <button className="link-btn" onClick={() => setR({ ...r, hours: [...r.hours, { meal: 'Dinner', open: '17:00', close: '22:00' }] })}>Add hours</button>
-      <label className="check"><input id={`rv-${r.id}`} type="checkbox" checked={!!r.verified} onChange={(e) => setR({ ...r, verified: e.target.checked })} /> Hours confirmed for the week of Nov 2</label>
-      <div className="actions"><button className="btn primary" onClick={onSave}>Save</button><button className="btn" onClick={() => setR(null)}>Cancel</button></div>
     </div>
   );
 }
@@ -135,7 +93,7 @@ export function Caddies() {
     <div className="page">
       <Back />
       <PageHead kicker={`$${rate} per player per round, fee and tip included`} title="Caddies">
-        <p className="small">Marc books caddies with the caddie master; Mike keeps the assignments here. Caddie Services <CopyText text="(541) 347-5909" /></p>
+        <p className="small">Marc books caddies with the caddie master. Caddie Services <CopyText text="(541) 347-5909" /></p>
       </PageHead>
       <Section title="Caddie fees">
         <div className="table-wrap"><table className="grid">
@@ -174,10 +132,9 @@ export function Caddies() {
 
 // ---------------- Lodging ----------------
 export function Lodging() {
-  const { list, isAdmin, save, me } = useStore();
+  const { list, me } = useStore();
   const { players } = useLookups();
   const rooms = list('rooms').sort((a, b) => a.type.localeCompare(b.type));
-  const [edit, setEdit] = useState(null);
   return (
     <div className="page">
       <Back />
@@ -186,25 +143,17 @@ export function Lodging() {
       </PageHead>
       <Section title="Rooms">
         <div className="room-list">
-          {rooms.map((r) => edit?.id === r.id ? (
-            <div className="card form" key={r.id}>
-              <Field label="Room number"><input id={`rm-${r.id}`} value={edit.number} onChange={(e) => setEdit({ ...edit, number: e.target.value })} /></Field>
-              <Field label="Confirmation #"><input id={`rc-${r.id}`} value={edit.conf} onChange={(e) => setEdit({ ...edit, conf: e.target.value })} /></Field>
-              <Field label="Checkout"><select id={`ro-${r.id}`} value={edit.checkout} onChange={(e) => setEdit({ ...edit, checkout: e.target.value })}><option value="2026-11-07">Sat Nov 7</option><option value="2026-11-08">Sun Nov 8</option></select></Field>
-              <div className="actions"><button className="btn primary" onClick={() => { save('rooms', edit); setEdit(null); }}>Save</button><button className="btn" onClick={() => setEdit(null)}>Cancel</button></div>
-            </div>
-          ) : (
+          {rooms.map((r) => (
             <div className="card room" key={r.id}>
               <div className="round-top"><span className="round-course">{r.occupants.map((pid) => players[pid]?.initials).join(' & ')}</span><span className="muted small">{r.type}</span></div>
               <div className="small">Room {r.number || '—'} · Conf {r.conf || '—'} · Checkout {dayLabel(r.checkout)}</div>
               {r.note && <div className="small muted">{r.note}</div>}
-              {isAdmin && <button className="link-btn" onClick={() => setEdit({ ...r })}>Edit</button>}
             </div>
           ))}
         </div>
       </Section>
       <Section title="Sunday night, Nov 1">
-        <p className="note">Not at the resort. Most of the group is at the Bandon Inn in town. Set yours in your profile.</p>
+        <p className="note">Not at the resort. Most of the group is at the Bandon Inn in town.</p>
         <ul className="plain-list">{Object.values(players).filter((p) => p.id !== 'aw').map((p) => <li key={p.id}><Who pid={p.id} players={players} me={me} /> <span className="small">{p.sundayLodging || '—'}</span></li>)}</ul>
       </Section>
     </div>
@@ -213,9 +162,8 @@ export function Lodging() {
 
 // ---------------- Players ----------------
 export function Players() {
-  const { me, isAdmin, settings } = useStore();
+  const { me, settings } = useStore();
   const { players } = useLookups();
-  const [open, setOpen] = useState(null);
   const lock = settings.handicapLock;
   return (
     <div className="page">
@@ -225,45 +173,20 @@ export function Players() {
         <Section key={team} title={<><TeamDot team={team} size={12} /> {teamName(team, settings)}</>}>
           <div className="player-list">
             {Object.values(players).filter((p) => p.team === team).sort((a, b) => (b.captain - a.captain) || a.name.localeCompare(b.name)).map((p) => (
-              open === p.id && (isAdmin || me?.id === p.id) ? <ProfileEditor key={p.id} p={p} onClose={() => setOpen(null)} /> : (
+              (
                 <div key={p.id} className={`card player ${me?.id === p.id ? 'is-me-card' : ''}`}>
                   <div className="player-top">
                     <span className="player-name">{p.name}</span>
                     <span className="mono hcp">{p.index ?? '—'}</span>
                   </div>
-                  <div className="small muted">{[p.initials, p.captain && 'Co-captain', p.role === 'admin' && 'Admin', p.role === 'caddie' && 'Caddie coordinator', p.id === 'aw' && 'From Wednesday', p.homeClub].filter(Boolean).join(' · ')}</div>
+                  <div className="small muted">{[p.initials, p.captain && 'Co-captain', p.id === 'aw' && 'From Wednesday', p.homeClub].filter(Boolean).join(' · ')}</div>
                   <div className="small">{p.ghin ? <>GHIN <span className="mono">{p.ghin}</span> · <a href="https://www.ghin.com/" target="_blank" rel="noreferrer">GHIN</a></> : <span className="muted">No GHIN # yet</span>}{p.tee && <> · Tees: {p.tee}</>}</div>
-                  {(isAdmin || me?.id === p.id) && <button className="link-btn" onClick={() => setOpen(p.id)}>{me?.id === p.id ? 'Edit my profile' : 'Edit'}</button>}
                 </div>
               )
             ))}
           </div>
         </Section>
       ))}
-    </div>
-  );
-}
-
-function ProfileEditor({ p, onClose }) {
-  const { save, isAdmin } = useStore();
-  const [d, setD] = useState({ ...p });
-  const f = (k) => ({ id: `pf-${p.id}-${k}`, value: d[k] ?? '', onChange: (e) => setD({ ...d, [k]: e.target.value }) });
-  const submit = () => {
-    const out = { ...d, index: d.index === '' || d.index === null || d.index === undefined ? null : Number(d.index) };
-    save('players', out); onClose();
-  };
-  return (
-    <div className="card form">
-      <div className="player-name">{p.name}</div>
-      <Field label="Handicap Index" hint={isAdmin ? 'Index as of the lock date' : 'Set by Marc, Josh or Mike'}><input {...f('index')} inputMode="decimal" disabled={!isAdmin} /></Field>
-      <Field label="GHIN #"><input {...f('ghin')} inputMode="numeric" /></Field>
-      <Field label="Preferred tees" hint="Must match a tee name on the course scorecard"><input {...f('tee')} /></Field>
-      <Field label="Mobile"><input {...f('phone')} inputMode="tel" /></Field>
-      <Field label="Sunday Nov 1 lodging"><input {...f('sundayLodging')} /></Field>
-      <Field label="Dietary notes"><input {...f('dietary')} /></Field>
-      {isAdmin && <Field label="Role"><select {...f('role')}><option value="player">Player</option><option value="caddie">Caddie coordinator</option><option value="admin">Admin</option></select></Field>}
-      {isAdmin && <label className="check"><input id={`pf-${p.id}-cap`} type="checkbox" checked={!!d.captain} onChange={(e) => setD({ ...d, captain: e.target.checked })} /> Co-captain</label>}
-      <div className="actions"><button className="btn primary" onClick={submit}>Save</button><button className="btn" onClick={onClose}>Cancel</button></div>
     </div>
   );
 }
@@ -337,21 +260,5 @@ export function Info() {
         <ul className="plain-list">{phones.map(([n, p]) => <li key={n}><span>{n}</span><CopyText text={p} /></li>)}</ul>
       </Section>
     </div>
-  );
-}
-
-function UnlockCard() {
-  const { me, unlockWithPin } = useStore();
-  const [pin, setPin] = useState('');
-  const [err, setErr] = useState('');
-  const [busy, setBusy] = useState(false);
-  const what = me?.role === 'admin' ? 'admin tools (results, pairings, handicaps, settings)' : 'caddie editing';
-  return (
-    <form className="card form" onSubmit={async (e) => { e.preventDefault(); setBusy(true); const m = await unlockWithPin(pin); setBusy(false); setErr(m || ''); }}>
-      <div className="strong">Unlock {what}</div>
-      <p className="small muted">Enter your PIN once on this phone.</p>
-      <div className="inline"><input id="unlock-pin" type="password" autoComplete="off" value={pin} onChange={(e) => setPin(e.target.value)} aria-label="PIN" /><button className="btn primary" disabled={busy || !pin}>{busy ? 'Checking…' : 'Unlock'}</button></div>
-      {err && <p className="note bad">{err}</p>}
-    </form>
   );
 }

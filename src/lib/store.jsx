@@ -1,23 +1,14 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import seed from '../data/seed.json';
-import { ENV } from './env.js';
+import resultsFile from '../data/results.json';
 
-export const TABLES = ['players', 'tee_times', 'results', 'settings', 'courses', 'restaurants', 'rooms', 'rides', 'rsvps', 'announcements', 'dinners'];
+// Read-only app. All trip data ships with the app:
+//   src/data/seed.json     players, tee times, caddies, courses, dinners (built by scripts/build-seed.mjs)
+//   src/data/results.json  match results, posted by Josh via Claude from Marc's scorecards
+// Any change is a commit to GitHub; Netlify republishes in a minute or two.
 
-// Accept the URL however it was pasted: trims spaces, a trailing slash, or a copied /rest/v1 endpoint.
-const SUPA_URL = (ENV.VITE_SUPABASE_URL || '').trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, '').replace(/\/+$/, '');
-const SUPA_KEY = (ENV.VITE_SUPABASE_ANON_KEY || '').trim().replace(/^['"]|['"]$/g, '');
-export const MODE = ENV.VITE_DEMO === '1' || !SUPA_URL || !SUPA_KEY ? 'demo' : 'live';
-
-const DEMO_KEY = 'bandon-shoe-demo-v13';
-const CACHE_KEY = 'bandon-shoe-cache-v3';
-const QUEUE_KEY = 'bandon-shoe-queue-v2';
+export const TABLES = ['players', 'tee_times', 'settings', 'courses', 'restaurants', 'rooms', 'rsvps', 'announcements', 'dinners'];
 const ME_KEY = 'bandon-shoe-me';
-const PIN_KEY = 'bandon-shoe-pin';
-const LINK_KEY = 'bandon-shoe-admin-link';
-
-// Fields only the admins (Marc, Josh, Mike) can change on a player profile.
-export const PROTECTED_PLAYER_FIELDS = ['role', 'team', 'captain', 'index', 'name', 'initials'];
 
 const ls = {
   get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } },
@@ -25,9 +16,10 @@ const ls = {
   del(k) { try { localStorage.removeItem(k); } catch { /* ignore */ } },
 };
 
-function indexSeed() {
+function buildState() {
   const s = {};
   for (const t of TABLES) s[t] = Object.fromEntries((seed[t] || []).map((r) => [r.id, r]));
+  s.results = Object.fromEntries((resultsFile.results || []).map((r) => [r.id, { status: 'posted', ...r }]));
   return s;
 }
 
@@ -35,234 +27,48 @@ const Ctx = createContext(null);
 export const useStore = () => useContext(Ctx);
 
 export function StoreProvider({ children }) {
-  const [state, setState] = useState(() => (MODE === 'demo' ? ls.get(DEMO_KEY)?.state : ls.get(CACHE_KEY)) || indexSeed());
-  const [audit, setAudit] = useState(() => (MODE === 'demo' ? ls.get(DEMO_KEY)?.audit || [] : []));
-  const [ready, setReady] = useState(MODE === 'demo' || !!ls.get(CACHE_KEY));
+  const [state] = useState(buildState);
   const [meId, setMeId] = useState(() => ls.get(ME_KEY));
-  const [unlock, setUnlock] = useState(() => ls.get(PIN_KEY)); // { pin, role, player }
   const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
-  const [queue, setQueue] = useState(() => ls.get(QUEUE_KEY) || []);
   const [toast, setToast] = useState(null);
-  const [loadError, setLoadError] = useState(null);
-  const sb = useRef(null);
-  const stateRef = useRef(state);
-  stateRef.current = state;
+
+  useEffect(() => {
+    const on = () => setOnline(true);
+    const off = () => setOnline(false);
+    window.addEventListener('online', on); window.addEventListener('offline', off);
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
+  }, []);
+
+  // Pick up a newer published version when the app comes back to the foreground.
+  useEffect(() => {
+    const check = async () => {
+      if (document.visibilityState !== 'visible' || !navigator.onLine) return;
+      try {
+        const res = await fetch(`/version.json?t=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        const v = await res.json();
+        if (v.updated && v.updated !== resultsFile.updated) window.location.reload();
+      } catch { /* offline or not deployed yet */ }
+    };
+    document.addEventListener('visibilitychange', check);
+    const iv = setInterval(check, 5 * 60 * 1000);
+    return () => { document.removeEventListener('visibilitychange', check); clearInterval(iv); };
+  }, []);
 
   const notify = useCallback((text, tone = 'ok') => {
     setToast({ text, tone, at: Date.now() });
     setTimeout(() => setToast((t) => (t && Date.now() - t.at > 3500 ? null : t)), 3800);
   }, []);
 
-  const applyRow = useCallback((table, id, data) => {
-    setState((s) => {
-      const next = { ...s, [table]: { ...s[table] } };
-      if (data === null) delete next[table][id]; else next[table][id] = { ...data, id };
-      if (MODE === 'live') ls.set(CACHE_KEY, next);
-      return next;
-    });
-  }, []);
-
-  // ---------- live mode: load everything, then listen for changes ----------
-  const loadAll = useCallback(async () => {
-    const client = sb.current; if (!client) return;
-    const next = {};
-    for (const t of TABLES) {
-      const { data, error } = await client.from(t).select('id,data');
-      if (error) {
-        if (isNetwork(error)) notify('No signal. Showing saved data.', 'warn');
-        else setLoadError(`Couldn't load ${t} from the database: ${error.message || error.code || 'unknown error'}${error.hint ? ` (${error.hint})` : ''}`);
-        console.error('[bandon-shoe] load failed', t, error);
-        setReady(true); return;
-      }
-      next[t] = Object.fromEntries(data.map((r) => [r.id, { ...r.data, id: r.id }]));
-    }
-    setState(next); ls.set(CACHE_KEY, next); setReady(true); setLoadError(null);
-  }, [notify]);
-
-  useEffect(() => {
-    if (MODE !== 'live') return;
-    let ch; let cancelled = false;
-    const reload = () => document.visibilityState === 'visible' && loadAll();
-    (async () => {
-      const { createClient } = await import('@supabase/supabase-js');
-      if (cancelled) return;
-      sb.current = createClient(SUPA_URL, SUPA_KEY, { auth: { persistSession: false } });
-      await loadAll();
-      ch = sb.current.channel('bandon-all');
-      for (const t of TABLES) {
-        ch.on('postgres_changes', { event: '*', schema: 'public', table: t }, (p) => {
-          if (p.eventType === 'DELETE') applyRow(t, p.old.id, null);
-          else applyRow(t, p.new.id, p.new.data);
-          if (t === 'results' && p.eventType !== 'DELETE' && p.new.data?.status === 'posted') notify('Match result posted');
-        });
-      }
-      ch.subscribe();
-      document.addEventListener('visibilitychange', reload);
-    })();
-    return () => { cancelled = true; ch && sb.current?.removeChannel(ch); document.removeEventListener('visibilitychange', reload); };
-  }, [loadAll, applyRow, notify]);
-
-  // ---------- who is using this phone ----------
   const me = useMemo(() => (meId ? state.players?.[meId] || null : null), [state.players, meId]);
-  const role = me?.role || 'player';
-  const unlockedRole = MODE === 'demo' ? role : (unlock && unlock.player === me?.id ? unlock.role : null);
-  const isAdmin = role === 'admin' && unlockedRole === 'admin';
-  const canCaddie = isAdmin || (role === 'caddie' && unlockedRole === 'caddie');
-  const needsPin = MODE === 'live' && (role === 'admin' || role === 'caddie') && !unlockedRole;
-
   const choosePlayer = useCallback((id) => { setMeId(id); ls.set(ME_KEY, id); }, []);
-  const switchPlayer = useCallback(() => { setMeId(null); ls.del(ME_KEY); setUnlock(null); ls.del(PIN_KEY); }, []);
-
-  const unlockWithPin = useCallback(async (pin) => {
-    if (MODE === 'demo') return null;
-    const { data, error } = await sb.current.rpc('check_pin', { p_pin: pin.trim() });
-    if (error) return isNetwork(error) ? 'No signal. Try again when you have service.' : error.message;
-    if (!data || data !== role) return 'That PIN doesn’t match.';
-    const u = { pin: pin.trim(), role: data, player: me.id };
-    setUnlock(u); ls.set(PIN_KEY, u);
-    notify(role === 'admin' ? 'Admin tools unlocked' : 'Caddie editing unlocked');
-    return null;
-  }, [role, me, notify]);
-
-  // ---------- private admin link: ?admin=<code> ----------
-  // The code is the admin PIN. Opening the link saves it on this phone and removes it from the
-  // address bar; once the golfer picks an admin name, the tools unlock without typing anything.
-  const [linkKey, setLinkKey] = useState(() => ls.get(LINK_KEY));
-  useEffect(() => {
-    try {
-      const url = new URL(window.location.href);
-      const code = url.searchParams.get('admin');
-      if (!code) return;
-      ls.set(LINK_KEY, code); setLinkKey(code);
-      url.searchParams.delete('admin');
-      window.history.replaceState(null, '', url.pathname + (url.search || '') + url.hash);
-    } catch { /* ignore */ }
-  }, []);
-  const triedLink = useRef(null);
-  useEffect(() => {
-    if (MODE !== 'live' || !linkKey || !me || !needsPin || !sb.current || !ready) return;
-    if (triedLink.current === `${me.id}:${linkKey}`) return;
-    triedLink.current = `${me.id}:${linkKey}`;
-    unlockWithPin(linkKey).then((err) => {
-      if (err === 'That PIN doesn’t match.') { ls.del(LINK_KEY); setLinkKey(null); notify('That admin link is out of date. Ask Josh for a new one.', 'bad'); }
-    });
-  }, [linkKey, me, needsPin, ready, unlockWithPin, notify]);
-
-  // ---------- writes ----------
-  const pushQueue = useCallback((op) => {
-    const q = [...(ls.get(QUEUE_KEY) || []), op];
-    ls.set(QUEUE_KEY, q); setQueue(q);
-  }, []);
-
-  const send = useCallback(async (op) => {
-    const c = sb.current;
-    const actor = op.actor || '?';
-    if (op.via === 'rpc') {
-      return op.kind === 'delete'
-        ? c.rpc('admin_delete', { p_pin: op.pin, p_actor: actor, p_table: op.table, p_id: op.id })
-        : c.rpc('admin_write', { p_pin: op.pin, p_actor: actor, p_table: op.table, p_id: op.id, p_data: op.data });
-    }
-    if (op.kind === 'delete') return c.from(op.table).delete().eq('id', op.id);
-    if (op.table === 'players') return c.from('players').update({ data: op.data, updated_by: actor }).eq('id', op.id);
-    return c.from(op.table).upsert({ id: op.id, data: op.data, updated_by: actor });
-  }, []);
-
-  const flush = useCallback(async () => {
-    if (MODE !== 'live' || !sb.current) return;
-    const pending = ls.get(QUEUE_KEY) || [];
-    const left = [];
-    for (const op of pending) {
-      const res = await send(op);
-      if (res.error && isNetwork(res.error)) left.push(op);
-      else if (res.error) notify(`A saved change was refused: ${res.error.message}`, 'bad');
-    }
-    ls.set(QUEUE_KEY, left); setQueue(left);
-    if (pending.length && !left.length) notify('Offline changes synced');
-  }, [notify, send]);
-
-  useEffect(() => {
-    const on = () => { setOnline(true); flush(); };
-    const off = () => setOnline(false);
-    window.addEventListener('online', on); window.addEventListener('offline', off);
-    const iv = setInterval(() => { if ((ls.get(QUEUE_KEY) || []).length && navigator.onLine) flush(); }, 20000);
-    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); clearInterval(iv); };
-  }, [flush]);
-
-  /** Which route a write takes, or a reason it isn't allowed from this phone. */
-  const routeFor = useCallback((table, obj, kind) => {
-    if (canCaddie && (isAdmin || table === 'tee_times')) return { via: 'rpc' };
-    if (table === 'rsvps' && obj?.player === me?.id) return { via: 'direct' };
-    if (table === 'players' && kind !== 'delete' && obj?.id === me?.id) {
-      const before = stateRef.current.players?.[obj.id] || {};
-      const touched = PROTECTED_PLAYER_FIELDS.filter((f) => JSON.stringify(before[f] ?? null) !== JSON.stringify(obj[f] ?? null));
-      if (touched.length) return { error: `Only Marc, Josh or Mike can change ${touched.join(', ')}.` };
-      return { via: 'direct' };
-    }
-    return { error: needsPin ? 'Unlock your admin tools with your PIN first (More → Unlock).' : 'Only Marc, Josh or Mike can change that.' };
-  }, [canCaddie, isAdmin, me, needsPin]);
-
-  const recordDemo = useCallback((table, id, before, after) => {
-    const entry = { id: Date.now() + Math.random(), at: new Date().toISOString(), actor: me?.initials || '?', table_name: table, row_id: id, before, after };
-    setAudit((a) => {
-      const n = [entry, ...a].slice(0, 300);
-      const st = { ...stateRef.current, [table]: { ...stateRef.current[table] } };
-      if (after) st[table][id] = after; else delete st[table][id];
-      ls.set(DEMO_KEY, { state: st, audit: n });
-      return n;
-    });
-  }, [me]);
-
-  const save = useCallback(async (table, obj, { quiet } = {}) => {
-    const route = routeFor(table, obj, 'upsert');
-    if (route.error) { notify(route.error, 'bad'); return false; }
-    const before = stateRef.current[table]?.[obj.id] || null;
-    applyRow(table, obj.id, obj);
-    if (MODE === 'demo') { recordDemo(table, obj.id, before, obj); if (!quiet) notify('Saved'); return true; }
-    const op = { kind: 'upsert', via: route.via, table, id: obj.id, data: obj, actor: me?.initials, pin: unlock?.pin };
-    const { error } = await send(op);
-    if (error && isNetwork(error)) { pushQueue(op); notify('No signal. Saved on this phone and will sync.', 'warn'); return true; }
-    if (error) { applyRow(table, obj.id, before); notify(error.message, 'bad'); return false; }
-    if (!quiet) notify('Saved');
-    return true;
-  }, [applyRow, me, notify, routeFor, recordDemo, send, pushQueue, unlock]);
-
-  const remove = useCallback(async (table, id) => {
-    const before = stateRef.current[table]?.[id] || null;
-    const route = routeFor(table, before, 'delete');
-    if (route.error) { notify(route.error, 'bad'); return false; }
-    applyRow(table, id, null);
-    if (MODE === 'demo') { recordDemo(table, id, before, null); notify('Removed'); return true; }
-    const op = { kind: 'delete', via: route.via, table, id, actor: me?.initials, pin: unlock?.pin };
-    const { error } = await send(op);
-    if (error && isNetwork(error)) { pushQueue(op); notify('No signal. Will sync when back online.', 'warn'); return true; }
-    if (error) { applyRow(table, id, before); notify(error.message, 'bad'); return false; }
-    notify('Removed'); return true;
-  }, [applyRow, me, notify, routeFor, recordDemo, send, pushQueue, unlock]);
-
-  const loadAudit = useCallback(async () => {
-    if (MODE === 'demo') return;
-    const { data, error } = await sb.current.from('audit_log').select('*').order('id', { ascending: false }).limit(200);
-    if (!error) setAudit(data);
-  }, []);
-
-  const undo = useCallback(async (entry) => {
-    if (entry.before) await save(entry.table_name, entry.before);
-    else await remove(entry.table_name, entry.row_id);
-  }, [save, remove]);
-
-  const resetDemo = useCallback(() => { ls.del(DEMO_KEY); setState(indexSeed()); setAudit([]); notify('Demo data reset'); }, [notify]);
-
+  const switchPlayer = useCallback(() => { setMeId(null); ls.del(ME_KEY); }, []);
   const list = useCallback((t) => Object.values(state[t] || {}), [state]);
   const settings = state.settings?.main || seed.settings[0];
 
   const value = {
-    mode: MODE, ready, loadError, supaHost: SUPA_URL.replace(/^https?:\/\//, ''), state, list, settings, me, isAdmin, canCaddie, needsPin, online, queue,
-    save, remove, audit, loadAudit, undo, choosePlayer, switchPlayer, unlockWithPin, resetDemo, notify, toast,
+    ready: true, state, list, settings, me, online, updated: resultsFile.updated,
+    choosePlayer, switchPlayer, notify, toast,
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
-}
-
-function isNetwork(err) {
-  const m = String(err?.message || err || '').toLowerCase();
-  return (typeof navigator !== 'undefined' && !navigator.onLine) || m.includes('failed to fetch') || m.includes('network') || m.includes('load failed');
 }

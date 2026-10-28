@@ -5,7 +5,7 @@ import { Pill, Who, go, useLookups, PageHead } from '../ui.jsx';
 import { teeResultText } from './MatchCard.jsx';
 
 export default function Schedule() {
-  const { me, canCaddie, settings } = useStore();
+  const { me, settings } = useStore();
   const { players, courses, teeTimes, results } = useLookups();
   const [mineOnly, setMineOnly] = useState(false);
   const days = TRIP_DAYS.filter((d) => teeTimes.some((t) => t.date === d.date));
@@ -48,7 +48,6 @@ export default function Schedule() {
                         ))}
                       </ul>
                     </button>
-                    {canCaddie && <button className="link-btn tee-edit" onClick={() => go(`edit-${t.id}`)}>Edit group</button>}
                   </div>
                 );
               })}

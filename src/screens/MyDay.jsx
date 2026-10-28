@@ -25,7 +25,7 @@ function useWeather(date) {
 }
 
 export default function MyDay() {
-  const { me, list, save, settings, mode, isAdmin, switchPlayer } = useStore();
+  const { me, list, settings, switchPlayer } = useStore();
   const { players, courses, teeTimes, results } = useLookups();
   const init = defaultDay();
   const [date, setDate] = useState(init.date);
@@ -44,7 +44,6 @@ export default function MyDay() {
   const myPreserve = rsvps.find((r) => r.id === `preserve:${who?.id}`);
   const restaurants = list('restaurants');
 
-  const setRsvp = (kind, ref, status) => save('rsvps', { id: `${kind === 'preserve' ? 'preserve' : `${kind}-${ref}`}:${who.id}`, kind, ref, player: who.id, status });
 
   const first = who?.nickname || who?.name?.split(' ')[0];
   return (
@@ -94,13 +93,8 @@ export default function MyDay() {
         {preserveTimes.length > 0 && !mine.some((t) => t.kind === 'optional') && (
           <div className="card round optional">
             <div className="round-top"><span className="round-time">{preserveTimes.map((t) => fmtTime(t.time)).join(' / ')}</span><span className="round-course">Bandon Preserve</span><Pill>Optional</Pill></div>
-            <p className="small">13-hole par-3 course before the 11:20 Pacific Dunes tee times. <b>{preserveIn.length} in</b> for 8 spots{preserveIn.length > 8 ? ' — one too many' : ''}.</p>
-            {who && (who.id === me?.id || isAdmin) && (
-              <div className="seg" role="group" aria-label="Preserve RSVP">
-                <button className={myPreserve?.status === 'in' ? 'on' : ''} onClick={() => setRsvp('preserve', 'preserve', 'in')}>I'm in</button>
-                <button className={myPreserve?.status === 'out' ? 'on' : ''} onClick={() => setRsvp('preserve', 'preserve', 'out')}>Sleeping in</button>
-              </div>
-            )}
+            <p className="small">13-hole par-3 course before the 11:20 Pacific Dunes tee times.</p>
+            <p className="small">{myPreserve?.status === 'in' ? <b>You’re on the list.</b> : <span className="muted">You’re not on the list.</span>} <span className="muted">Playing: {preserveIn.map((r) => players[r.player]?.initials).join(', ')}</span></p>
           </div>
         )}
       </Section>
@@ -141,7 +135,6 @@ export default function MyDay() {
           )}
         </Section>
       )}
-      {mode === 'demo' && <p className="small muted center">Demo mode: changes stay on this device.</p>}
     </div>
   );
 }

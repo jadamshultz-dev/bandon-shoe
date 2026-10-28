@@ -38,7 +38,7 @@ export const FORMAT_NOTES = {
 };
 
 export default function MatchCard({ id }) {
-  const { me, isAdmin, save, list } = useStore();
+  const { me, list } = useStore();
   const { players, courses, teeTimes, results, settings } = useLookups();
   const tt = teeTimes.find((t) => t.id === id);
   if (!tt) return <div className="page"><Back to="schedule" label="Schedule" /><p className="empty">That match is not in the schedule.</p></div>;
@@ -51,10 +51,7 @@ export default function MatchCard({ id }) {
   const nines = [holes.slice(0, Math.min(9, holes.length)), holes.slice(9)].filter((h) => h.length);
   const isMatch = tt.kind === 'match' || tt.kind === 'singles';
 
-  const setAdjust = (pid, delta) => {
-    const cur = Number(tt.adjust?.[pid] || 0) + delta;
-    save('tee_times', { ...tt, adjust: { ...(tt.adjust || {}), [pid]: cur } });
-  };
+
 
   // Rows for the stroke-hole grid, by format.
   let gridRows = [];
@@ -82,7 +79,6 @@ export default function MatchCard({ id }) {
             : r?.status ? <Pill tone="warn">{statusLabel(r.status)}</Pill> : <Pill>Scheduled</Pill>)}
           {tt.kind === 'singles' && <Pill>{teeResultText(tt, results, players, settings) || '4 singles matches'}</Pill>}
           {tt.paceSetter && <Pill tone="warn">Pace Setter · 4:00</Pill>}
-          {isAdmin && tt.kind === 'match' && <button className="link-btn" onClick={() => go(`score-${tt.id}`)}>Enter result</button>}
         </div>
         {FORMAT_NOTES[m.format] && <p className="small muted">{FORMAT_NOTES[m.format]}</p>}
       </header>
@@ -110,7 +106,6 @@ export default function MatchCard({ id }) {
                   <span><Who pid={p.a} players={players} me={me} /> v <Who pid={p.b} players={players} me={me} /></span>
                   <span className="small">{p.strokes === null ? <span className="muted">Strokes TBD</span> : p.receiver ? <>{players[p.receiver]?.initials} gets <b>{p.strokes}</b></> : 'Level'}</span>
                   {resultText(rr, settings) && <Pill tone={rr.winner === 'DCBG' ? 'dcbg' : rr.winner === 'JES' ? 'jes' : 'neutral'}>{resultText(rr, settings)}</Pill>}
-                  {isAdmin && p.a && p.b && <button className="link-btn" onClick={() => go(`score-${p.id}`)}>Enter result</button>}
                 </li>
               );
             })}
@@ -127,7 +122,7 @@ export default function MatchCard({ id }) {
           {m.rows.length === 0 ? <p className="empty">No players assigned yet.</p> : (
             <div className="table-wrap">
               <table className="grid strokes">
-                <thead><tr><th>Player</th><th className="num" title="Handicap Index">Index</th><th>Tee</th>{m.format !== 'foursomes' && <><th className="num" title="Playing handicap for this round">Play</th>{(m.format === 'fourball' || m.format === 'casual') && <th className="num" title="Strokes received this match">Gets</th>}</>}{isAdmin && m.format !== 'foursomes' && <th className="num">Adjust</th>}</tr></thead>
+                <thead><tr><th>Player</th><th className="num" title="Handicap Index">Index</th><th>Tee</th>{m.format !== 'foursomes' && <><th className="num" title="Playing handicap for this round">Play</th>{(m.format === 'fourball' || m.format === 'casual') && <th className="num" title="Strokes received this match">Gets</th>}</>}</tr></thead>
                 <tbody>
                   {m.rows.map((row) => (
                     <tr key={row.pid} className={me?.id === row.pid ? 'me-row' : ''}>
@@ -138,7 +133,6 @@ export default function MatchCard({ id }) {
                         <td className="num">{row.ph ?? '—'}{row.source === 'calc' && row.ph !== null && <sup title="Calculated; not on Marc's sheet">c</sup>}{(row.equitable || row.adjust) ? <span className="muted small"> ({row.base}{row.equitable ? ` ${row.equitable > 0 ? '+' : '−'}${Math.abs(row.equitable)} eq` : ''}{row.adjust ? ` ${row.adjust > 0 ? '+' : '−'}${Math.abs(row.adjust)}` : ''})</span> : null}</td>
                         {(m.format === 'fourball' || m.format === 'casual') && <td className="num strong">{row.strokes ?? '—'}</td>}
                       </>}
-                      {isAdmin && m.format !== 'foursomes' && <td className="num nowrap"><button className="mini" aria-label={`One fewer stroke for ${players[row.pid]?.initials}`} onClick={() => setAdjust(row.pid, -1)}>−</button><button className="mini" aria-label={`One more stroke for ${players[row.pid]?.initials}`} onClick={() => setAdjust(row.pid, 1)}>+</button></td>}
                     </tr>
                   ))}
                 </tbody>
