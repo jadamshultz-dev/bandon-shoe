@@ -7,7 +7,7 @@ const MENU = [
   ['dining', 'Dining', 'Restaurants, hours and group dinners'],
   ['caddies', 'Caddies', 'Who carries for whom, and caddie fees'],
   ['lodging', 'Lodging', 'Rooms, check-in and checkout'],
-  ['players', 'Players', 'Roster, handicaps and GHIN'],
+  ['players', 'Players', 'Teams, handicaps and tees'],
   ['map', 'Map', 'Lodges, first tees and restaurants'],
   ['info', 'Resort info', 'Rules, phone numbers and pace of play'],
 ];
@@ -177,7 +177,7 @@ export function Players() {
                     <span className="mono hcp">{p.index ?? '—'}</span>
                   </div>
                   <div className="small muted">{[p.initials, p.captain && 'Co-captain', p.id === 'aw' && 'From Wednesday', p.guest && 'Monday and Tuesday practice rounds only', p.homeClub].filter(Boolean).join(' · ')}</div>
-                  {(p.ghin || p.tee) && <div className="small">{p.ghin && <>GHIN <span className="mono">{p.ghin}</span> · <a href="https://www.ghin.com/" target="_blank" rel="noreferrer">GHIN</a></>}{p.ghin && p.tee && ' · '}{p.tee && <>Tees: {p.tee}</>}</div>}
+                  {p.tee && <div className="small">Tees: {p.tee}</div>}
                 </div>
               )
             ))}

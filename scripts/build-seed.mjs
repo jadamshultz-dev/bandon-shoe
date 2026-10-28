@@ -5,7 +5,7 @@ import { applyScorecard } from './scorecards.mjs';
 
 const P = (id, name, initials, team, emails, extra = {}) => ({
   id, name, initials, team,
-  role: 'player', captain: false, index: null, ghin: '', tee: '', phone: '',
+  role: 'player', captain: false, index: null, tee: '', phone: '',
   homeClub: '', activeFrom: '2026-11-02', activeTo: '2026-11-08',
   sundayLodging: 'Bandon Inn', flightIn: '', flightOut: '', dietary: '', notes: '',
   ...extra,
@@ -19,7 +19,7 @@ const players = [
   P('mt', 'Marc Tardif', 'MT', 'JES', ['mtardif@gmail.com']),
   P('court', 'Court Lanio', 'Court', 'JES', ['court.lanio@gmail.com']),
   P('ms', 'Marc Schoenecker', 'MS', 'DCBG', ['marc.schoenecker@verizon.com', 'marcschoenecker@yahoo.com'], { captain: true, role: 'admin' }),
-  P('aw', 'Adam Whitehead', 'AW', 'DCBG', [], { homeClub: 'Las Colinas Country Club, Irving, TX', activeFrom: '2026-11-04', notes: 'Email, GHIN # and co-captain status TBD.' }),
+  P('aw', 'Adam Whitehead', 'AW', 'DCBG', [], { homeClub: 'Las Colinas Country Club, Irving, TX', activeFrom: '2026-11-04', notes: '' }),
   P('gn', 'Greg Noschese', 'GN', 'DCBG', ['gnoschese@munsch.com'], { captain: true }),
   P('rw', 'Rick Wiley', 'RW', 'DCBG', ['rick.wiley@verizon.net']),
   P('joel', 'Joel Schoenecker', 'Joel', 'DCBG', ['jschoe0309@gmail.com']),
@@ -27,7 +27,7 @@ const players = [
   P('cl', 'Craig Lilly', 'CL', 'DCBG', [], { guest: true, activeTo: '2026-11-03', notes: 'Monday and Tuesday practice rounds only. Not in the Shoe.' }),
 ];
 
-// Handicap Index from Marc's final sheet (Oct 19, 2026 GHIN).
+// Handicap Index from Marc's final sheet, locked as of Oct 19, 2026.
 const INDEX = { gn: 2.7, ms: 9.2, rw: 10.6, joel: 11.1, aw: 11.5, jon: 29, ap: 6.9, josh: 7.8, court: 10.1, mt: 11.6, mp: 12.7, sc: 12.8 };
 const GOLD = ['sc', 'rw', 'jon']; // everyone else plays the Green tees
 for (const p of players) { if (INDEX[p.id] !== undefined) p.index = INDEX[p.id]; p.tee = GOLD.includes(p.id) ? 'Gold' : 'Green'; }
