@@ -100,7 +100,7 @@ const H = (meal, open, close) => ({ meal, open, close });
 const DINING = 'https://bandondunesgolf.com/dining/restaurants/';
 const UP = 'https://bandondunesgolf.com/wp-content/uploads/';
 const restaurants = [
-  { id: 'ghost-tree', name: 'Ghost Tree Grill', kind: 'Steakhouse and raw bar', where: '', phone: '(855) 220-6710', booking: 'Reservations', hours: [H('Dinner', '17:00', '22:00')], verified: false, menu: DINING, menuNote: 'Current menus on the resort site' },
+  { id: 'ghost-tree', name: 'Ghost Tree Grill', kind: 'Steakhouse and raw bar', where: '', phone: '(855) 220-6710', booking: 'Reservations', hours: [H('Dinner', '17:00', '22:00')], verified: false, menu: UP + '2026/10/GTG-Menu-10-26-26-Dinner.pdf', menuNote: 'Dinner menu, Oct 26, 2026' },
   { id: 'gallery', name: 'The Gallery & Puffin Bar', kind: 'Main dining room; new Italian menu for lunch and dinner', where: 'Main Lodge', phone: '(541) 347-5220', booking: 'Reservations recommended for dinner', hours: [H('Breakfast', '06:00', '11:00'), H('Lunch', '11:00', '17:00'), H('Dinner', '17:00', '22:00')], verified: false, menu: DINING, menuNote: 'New 2026 menu on the resort site' },
   { id: 'mckees', name: "McKee's Pub", kind: 'Scottish-style pub', where: '', phone: '(541) 347-5861', booking: 'Walk-in only', hours: [H('Dinner', '16:00', '23:00')], verified: false, menu: UP + '2025/08/McKees-Pub-Menu-8-1-25-Dinner.pdf', menuNote: 'Dinner menu, Aug 2025' },
   { id: 'pacific-grill', name: 'Pacific Grill', kind: 'Clubhouse restaurant', where: 'Pacific Dunes clubhouse', phone: '(541) 347-8432', booking: '', hours: [], verified: false, menu: UP + '2024/08/Pacific-Grill-Dinner-Menu-8.26.24.pdf', menuNote: 'Dinner menu, Aug 2024' },
