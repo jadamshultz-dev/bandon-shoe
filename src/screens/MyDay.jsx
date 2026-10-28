@@ -106,7 +106,7 @@ export default function MyDay() {
               const r = restaurants.find((x) => x.name === n);
               const isToday = !init.preview && date === init.date;
               const os = r ? (isToday ? openState(r.hours) : { state: 'neutral', text: r.hours?.length ? r.hours.map((h) => `${h.meal} ${fmtTime(h.open)}–${fmtTime(h.close)}`).join(' · ') : 'Hours not entered' }) : null;
-              return <li key={n}><span>{n}</span>{os && <Pill tone={os.state === 'open' ? 'ok' : os.state === 'closing' ? 'warn' : 'neutral'}>{os.text}</Pill>}</li>;
+              return <li key={n}><span>{n}</span>{os && os.state !== 'unknown' && os.text !== 'Hours not entered' && <Pill tone={os.state === 'open' ? 'ok' : os.state === 'closing' ? 'warn' : 'neutral'}>{os.text}</Pill>}</li>;
             })}
           </ul>
         </Section>

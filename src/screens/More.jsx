@@ -61,7 +61,7 @@ export function Dining() {
             const os = openState(r.hours);
             return (
               <div className="card rest" key={r.id}>
-                <div className="rest-top"><span className="rest-name">{r.name}</span><Pill tone={os.state === 'open' ? 'ok' : os.state === 'closing' ? 'warn' : 'neutral'}>{os.text}</Pill></div>
+                <div className="rest-top"><span className="rest-name">{r.name}</span>{os.state !== 'unknown' && <Pill tone={os.state === 'open' ? 'ok' : os.state === 'closing' ? 'warn' : 'neutral'}>{os.text}</Pill>}</div>
                 <div className="muted small">{[r.kind, r.where].filter(Boolean).join(' · ')}</div>
                 {r.hours?.length > 0 && <ul className="hours">{r.hours.map((h) => <li key={h.meal}><span>{h.meal}</span><span className="mono">{fmtTime(h.open)}–{fmtTime(h.close)}</span></li>)}</ul>}
                 <div className="small">{r.booking}{r.booking && r.phone ? ' · ' : ''}{r.phone && <CopyText text={r.phone} />}</div>
@@ -69,7 +69,7 @@ export function Dining() {
                   {r.menu && <a className="btn primary small" href={r.menu} target="_blank" rel="noreferrer">View menu</a>}
                   <a className="small" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.id === 'wheelhouse' ? 'Wheelhouse Restaurant 125 Chicago St Bandon OR' : r.name + ' Bandon Dunes')}`} target="_blank" rel="noreferrer">Map</a>
                 </div>
-                {r.menuNote && <div className="small muted">{r.menuNote}{!r.verified ? ' · hours to confirm' : ''}</div>}
+                {r.menuNote && <div className="small muted">{r.menuNote}</div>}
               </div>
             );
           })}
@@ -148,7 +148,7 @@ export function Lodging() {
           {rooms.map((r) => (
             <div className="card room" key={r.id}>
               <div className="round-top"><span className="round-course">{r.occupants.map((pid) => players[pid]?.initials).join(' & ')}</span><span className="muted small">{r.type}</span></div>
-              <div className="small">Room {r.number || '—'} · Conf {r.conf || '—'} · Checkout {dayLabel(r.checkout)}</div>
+              <div className="small">{[r.number && `Room ${r.number}`, r.conf && `Conf ${r.conf}`, `Checkout ${dayLabel(r.checkout)}`].filter(Boolean).join(' · ')}</div>
               {r.note && <div className="small muted">{r.note}</div>}
             </div>
           ))}
@@ -182,7 +182,7 @@ export function Players() {
                     <span className="mono hcp">{p.index ?? '—'}</span>
                   </div>
                   <div className="small muted">{[p.initials, p.captain && 'Co-captain', p.id === 'aw' && 'From Wednesday', p.guest && 'Monday and Tuesday practice rounds only', p.homeClub].filter(Boolean).join(' · ')}</div>
-                  <div className="small">{p.ghin ? <>GHIN <span className="mono">{p.ghin}</span> · <a href="https://www.ghin.com/" target="_blank" rel="noreferrer">GHIN</a></> : <span className="muted">No GHIN # yet</span>}{p.tee && <> · Tees: {p.tee}</>}</div>
+                  {(p.ghin || p.tee) && <div className="small">{p.ghin && <>GHIN <span className="mono">{p.ghin}</span> · <a href="https://www.ghin.com/" target="_blank" rel="noreferrer">GHIN</a></>}{p.ghin && p.tee && ' · '}{p.tee && <>Tees: {p.tee}</>}</div>}
                 </div>
               )
             ))}
