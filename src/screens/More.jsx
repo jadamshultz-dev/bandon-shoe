@@ -179,7 +179,7 @@ export function Players() {
                     <span className="player-name">{p.name}</span>
                     <span className="mono hcp">{p.index ?? '—'}</span>
                   </div>
-                  <div className="small muted">{[p.initials, p.captain && 'Co-captain', p.id === 'aw' && 'From Wednesday', p.guest && 'Tuesday practice round only', p.homeClub].filter(Boolean).join(' · ')}</div>
+                  <div className="small muted">{[p.initials, p.captain && 'Co-captain', p.id === 'aw' && 'From Wednesday', p.guest && 'Monday and Tuesday practice rounds only', p.homeClub].filter(Boolean).join(' · ')}</div>
                   <div className="small">{p.ghin ? <>GHIN <span className="mono">{p.ghin}</span> · <a href="https://www.ghin.com/" target="_blank" rel="noreferrer">GHIN</a></> : <span className="muted">No GHIN # yet</span>}{p.tee && <> · Tees: {p.tee}</>}</div>
                 </div>
               )

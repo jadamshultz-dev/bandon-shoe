@@ -24,7 +24,7 @@ const players = [
   P('rw', 'Rick Wiley', 'RW', 'DCBG', ['rick.wiley@verizon.net']),
   P('joel', 'Joel Schoenecker', 'Joel', 'DCBG', ['jschoe0309@gmail.com']),
   P('jon', 'Bonnie Jon Schoenecker', 'Bonnie Jon', 'DCBG', ['getjon62@gmail.com'], { nickname: 'Bonnie Jon' }),
-  P('cl', 'Craig Lilly', 'CL', 'DCBG', [], { guest: true, activeTo: '2026-11-03', notes: 'Tuesday practice round only. Not in the Shoe.' }),
+  P('cl', 'Craig Lilly', 'CL', 'DCBG', [], { guest: true, activeTo: '2026-11-03', notes: 'Monday and Tuesday practice rounds only. Not in the Shoe.' }),
 ];
 
 // Handicap Index from Marc's final sheet (Oct 19, 2026 GHIN).
@@ -42,6 +42,12 @@ const T = (id, date, time, course, session, kind, list, extra = {}) => ({
 });
 
 const teeTimes = [
+  // Monday practice rounds from Marc's sheet. The 12:00 Bandon Trails time is on the resort confirmation
+  // but not on Marc's sheet, so its group is left open until he confirms it.
+  T('mon-1200-bt', '2026-11-02', '12:00', 'bandon-trails', null, 'casual', []),
+  T('mon-1210-om', '2026-11-02', '12:10', 'old-macdonald', null, 'casual', [['gn'], ['sc'], ['mt'], ['ap']]),
+  T('mon-1220-bd', '2026-11-02', '12:20', 'bandon-dunes', null, 'casual', [['ms'], ['cl'], ['rw'], ['mp']]),
+
   T('tue-1200-bt', '2026-11-03', '12:00', 'bandon-trails', null, 'casual', [['mp'], ['mt'], ['josh'], ['court']]),
   T('tue-1200-bd', '2026-11-03', '12:00', 'bandon-dunes', null, 'casual', [['ms'], ['cl'], ['jon'], ['joel']]),
   T('tue-1210-sr', '2026-11-03', '12:10', 'sheep-ranch', null, 'casual', [['gn'], ['rw'], ['sc'], ['ap']]),

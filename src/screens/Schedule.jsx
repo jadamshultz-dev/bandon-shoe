@@ -13,7 +13,7 @@ export default function Schedule() {
 
   return (
     <div className="page">
-      <PageHead kicker="Tuesday Nov 3 – Saturday Nov 7 · all times Pacific" title="Tee sheet">
+      <PageHead kicker="Monday Nov 2 – Saturday Nov 7 · all times Pacific" title="Tee sheet">
         <div className="seg" role="group" aria-label="Filter">
           <button className={!mineOnly ? 'on' : ''} onClick={() => setMineOnly(false)}>Everyone</button>
           <button className={mineOnly ? 'on' : ''} onClick={() => setMineOnly(true)}>Just me</button>

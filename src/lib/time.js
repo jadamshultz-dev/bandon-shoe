@@ -1,6 +1,7 @@
 // All trip times are Pacific.
 export const TZ = 'America/Los_Angeles';
 export const TRIP_DAYS = [
+  { date: '2026-11-02', short: 'Mon', label: 'Mon Nov 2' },
   { date: '2026-11-03', short: 'Tue', label: 'Tue Nov 3' },
   { date: '2026-11-04', short: 'Wed', label: 'Wed Nov 4' },
   { date: '2026-11-05', short: 'Thu', label: 'Thu Nov 5' },

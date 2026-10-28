@@ -259,11 +259,67 @@
       "flightIn": "",
       "flightOut": "",
       "dietary": "",
-      "notes": "Tuesday practice round only. Not in the Shoe.",
+      "notes": "Monday and Tuesday practice rounds only. Not in the Shoe.",
       "guest": true
     }
   ],
   "tee_times": [
+    {
+      "id": "mon-1200-bt",
+      "date": "2026-11-02",
+      "time": "12:00",
+      "course": "bandon-trails",
+      "session": null,
+      "kind": "casual",
+      "players": [],
+      "caddies": {},
+      "paceSetter": false,
+      "adjust": {}
+    },
+    {
+      "id": "mon-1210-om",
+      "date": "2026-11-02",
+      "time": "12:10",
+      "course": "old-macdonald",
+      "session": null,
+      "kind": "casual",
+      "players": [
+        "gn",
+        "sc",
+        "mt",
+        "ap"
+      ],
+      "caddies": {
+        "gn": null,
+        "sc": null,
+        "mt": null,
+        "ap": null
+      },
+      "paceSetter": false,
+      "adjust": {}
+    },
+    {
+      "id": "mon-1220-bd",
+      "date": "2026-11-02",
+      "time": "12:20",
+      "course": "bandon-dunes",
+      "session": null,
+      "kind": "casual",
+      "players": [
+        "ms",
+        "cl",
+        "rw",
+        "mp"
+      ],
+      "caddies": {
+        "ms": null,
+        "cl": null,
+        "rw": null,
+        "mp": null
+      },
+      "paceSetter": false,
+      "adjust": {}
+    },
     {
       "id": "tue-1200-bt",
       "date": "2026-11-03",
