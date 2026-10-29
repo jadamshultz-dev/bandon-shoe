@@ -91,7 +91,7 @@ export default function Preserve() {
     <div className="page">
       <Back to="myday" label="My Day" />
       <PageHead kicker="Thursday Nov 5 · 8:00 & 8:15 · 13 par-3 holes" title="Preserve Stableford">
-        <p className="small">Ace 10 · Birdie 5 · Par 3 · Bogey 1 · Worse 0. Gross scores, no handicaps. Any player can enter his own card.</p>
+        <p className="small">Ace 10 · Birdie 5 · Par 3 · Bogey 1 · Worse 0. Anything worse than bogey goes in as a 5. Gross scores, no handicaps. Any player can enter his own card.</p>
       </PageHead>
 
       {status === 'unavailable' && <p className="note bad">Scores can’t load right now. Try again in a minute.</p>}
@@ -140,7 +140,7 @@ export default function Preserve() {
                     <div className="muted sf-yds">{h.yards?.Back} yd</div>
                     <select id={`sf-${who}-${h.n}`} aria-label={`Hole ${h.n} score`} value={card[i] ?? ''} onChange={(e) => setHole(i, e.target.value === '' ? null : Number(e.target.value))}>
                       <option value="">–</option>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((v) => <option key={v} value={v}>{v}</option>)}
+                      {[1, 2, 3, 4, 5].map((v) => <option key={v} value={v}>{v === 5 ? '5+' : v}</option>)}
                     </select>
                     <div className={`sf-pts ${pts === null ? '' : pts >= 5 ? 'hot' : pts === 0 ? 'cold' : ''}`}>{pts === null ? '' : `${pts} pt${pts === 1 ? '' : 's'}`}</div>
                   </div>

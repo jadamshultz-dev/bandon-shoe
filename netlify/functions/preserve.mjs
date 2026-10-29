@@ -1,7 +1,7 @@
 // Thursday Preserve Stableford scores, stored in Netlify Blobs (no database or keys needed).
 //   GET  /api/preserve            -> { scores: { <playerId>: { holes: [13 numbers or null], updated } } }
 //   POST /api/preserve            body { player, holes }  -> saves that player's card
-// Only the eight Preserve players can be saved; scores must be whole numbers 1–9.
+// Only the eight Preserve players can be saved; scores are whole numbers 1–5 (worse than bogey is recorded as 5).
 import { getStore } from '@netlify/blobs';
 
 const PLAYERS = ['sc', 'joel', 'mp', 'mt', 'jon', 'ap', 'aw', 'court'];
@@ -27,7 +27,8 @@ export default async (req) => {
     if (!PLAYERS.includes(player)) return json({ error: 'Not a Preserve player' }, 400);
     if (!Array.isArray(holes) || holes.length !== HOLES) return json({ error: 'Need 13 holes' }, 400);
     const clean = holes.map((h) => (h === null || h === '' || h === undefined ? null : Number(h)));
-    if (clean.some((h) => h !== null && (!Number.isInteger(h) || h < 1 || h > 9))) return json({ error: 'Scores must be 1–9' }, 400);
+    if (clean.some((h) => h !== null && (!Number.isInteger(h) || h < 1))) return json({ error: 'Scores must be 1–5' }, 400);
+    for (let i = 0; i < clean.length; i++) if (clean[i] !== null && clean[i] > 5) clean[i] = 5; // anything worse than bogey counts as 5
     const card = { holes: clean, updated: new Date().toISOString() };
     await store.setJSON(player, card);
     return json({ ok: true, card });
