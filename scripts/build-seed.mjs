@@ -72,7 +72,7 @@ const teeTimes = [
   T('fri-1230-sr', '2026-11-06', '12:30', 'sheep-ranch', 'fri-pm', 'match', [['gn', PK], ['jon'], ['ap'], ['josh', PK]]),
   T('fri-1240-sr', '2026-11-06', '12:40', 'sheep-ranch', 'fri-pm', 'match', [['rw', BH], ['aw', BH], ['sc', JJ], ['mt', JJ]]),
 
-  T('sat-0930-bd', '2026-11-07', '09:30', 'bandon-dunes', 'sat', 'singles', [['ms', SD]]),
+  T('sat-0930-bd', '2026-11-07', '09:30', 'bandon-dunes', 'sat', 'singles', []),
   T('sat-0940-bd', '2026-11-07', '09:40', 'bandon-dunes', 'sat', 'singles', []),
   T('sat-0950-bd', '2026-11-07', '09:50', 'bandon-dunes', 'sat', 'singles', []),
 ];

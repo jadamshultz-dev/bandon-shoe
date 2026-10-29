@@ -749,12 +749,8 @@
       "course": "bandon-dunes",
       "session": "sat",
       "kind": "singles",
-      "players": [
-        "ms"
-      ],
-      "caddies": {
-        "ms": "Surfer Dave"
-      },
+      "players": [],
+      "caddies": {},
       "paceSetter": false,
       "adjust": {}
     },
