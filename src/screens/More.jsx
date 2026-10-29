@@ -94,12 +94,12 @@ export function Caddies() {
   return (
     <div className="page">
       <Back />
-      <PageHead kicker={`$${rate} per player per round, fee and tip included`} title="Caddies">
+      <PageHead kicker={`$${rate} minimum per player per round, fee and tip`} title="Caddies">
         <p className="small">Marc books caddies with the caddie master. Caddie Services <CopyText text="(541) 347-5909" /></p>
       </PageHead>
       <Section title="Caddie fees">
         <div className="table-wrap"><table className="grid">
-          <thead><tr><th>Player</th><th className="num">Rounds with caddie</th><th className="num">Total</th></tr></thead>
+          <thead><tr><th>Player</th><th className="num">Rounds with caddie</th><th className="num">Minimum</th></tr></thead>
           <tbody>
             {Object.values(players).filter((p) => !p.guest).sort((a, b) => a.name.localeCompare(b.name)).map((p) => (
               <tr key={p.id} className={me?.id === p.id ? 'me-row' : ''}><td><Who pid={p.id} players={players} me={me} /> <span className="small">{p.name}</span></td><td className="num">{counts[p.id] || 0}</td><td className="num">${((counts[p.id] || 0) * rate).toLocaleString()}</td></tr>
