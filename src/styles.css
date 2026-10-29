@@ -386,3 +386,5 @@ h2 { font-family: var(--f-head); font-weight: 600; color: var(--ink); letter-spa
 .sf-pts { font: 600 0.8rem var(--f-mono); min-height: 1.1em; color: var(--ink-2); }
 .sf-pts.hot { color: var(--accent-green); }
 .sf-pts.cold { color: var(--bad); }
+.grid th.th-wrap { white-space: normal; line-height: 1.15; }
+.table-wrap .grid th, .table-wrap .grid td { padding-left: 8px; padding-right: 8px; }

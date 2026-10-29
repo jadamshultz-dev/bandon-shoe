@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '../lib/store.jsx';
-import { stablefordPoints } from '../lib/golf.js';
+import { stablefordPoints, equitableAdjustments } from '../lib/golf.js';
 import { Back, PageHead, Section, TeamDot, useLookups } from '../ui.jsx';
 
 // Thursday's optional Bandon Preserve round: open Stableford scorecard any participant can fill in.
@@ -10,11 +10,15 @@ const LOCAL = 'bandon-shoe-preserve-draft';
 const blank = () => Array(13).fill(null);
 const total = (holes) => (holes || []).reduce((s, h) => s + (stablefordPoints(h) ?? 0), 0);
 const thru = (holes) => (holes || []).filter((h) => h !== null && h !== undefined).length;
+// Starting points: 13/18 (0.722) of the player's Handicap Index after Wednesday's adjustments, rounded down.
+export const START_FACTOR = 13 / 18;
+export const startingPoints = (index, adj = 0) => (index === null || index === undefined ? 0 : Math.floor((Number(index) + adj) * START_FACTOR));
 const strokes = (holes) => (holes || []).reduce((s, h) => s + (h || 0), 0);
 
 export default function Preserve() {
   const { me } = useStore();
-  const { players, courses } = useLookups();
+  const { players, courses, teeTimes, settings } = useLookups();
+  const { list } = useStore();
   const course = courses['bandon-preserve'];
   const holes = course?.holes || [];
   const [scores, setScores] = useState({});
@@ -84,14 +88,21 @@ export default function Preserve() {
     save(who, next);
   };
 
-  const board = PRESERVE_PLAYERS.map((p) => ({ p, holes: scores[p]?.holes })).sort((a, b) => total(b.holes) - total(a.holes) || thru(b.holes) - thru(a.holes));
-  const leaderPts = total(board[0]?.holes);
+  const results = list('results');
+  const eq = equitableAdjustments(teeTimes, results, players, settings, 'thu');
+  const wedIds = teeTimes.filter((x) => x.session === 'wed-am' || x.session === 'wed-pm').map((x) => x.id);
+  const wedDone = wedIds.every((id) => results.some((r) => r.id === id));
+  const start = Object.fromEntries(PRESERVE_PLAYERS.map((p) => [p, startingPoints(players[p]?.index, eq[p] || 0)]));
+  const grand = (p, h) => start[p] + total(h);
+  const board = PRESERVE_PLAYERS.map((p) => ({ p, holes: scores[p]?.holes })).sort((a, b) => grand(b.p, b.holes) - grand(a.p, a.holes) || thru(b.holes) - thru(a.holes));
+  const leaderPts = grand(board[0]?.p, board[0]?.holes);
+  const anyStarted = board.some((x) => thru(x.holes));
 
   return (
     <div className="page">
       <Back to="myday" label="My Day" />
       <PageHead kicker="Thursday Nov 5 · 8:00 & 8:15 · 13 par-3 holes" title="Preserve Stableford">
-        <p className="small">Ace 10 · Birdie 5 · Par 3 · Bogey 1 · Worse 0. Anything worse than bogey goes in as a 5. Gross scores, no handicaps. Any player can enter his own card.</p>
+        <p className="small">Ace 10 · Birdie 5 · Par 3 · Bogey 1 · Worse 0. Anything worse than bogey goes in as a 5. Gross scores, plus starting points from your handicap. Any player can enter his own card.</p>
       </PageHead>
 
       {status === 'unavailable' && <p className="note bad">Scores can’t load right now. Try again in a minute.</p>}
@@ -100,19 +111,21 @@ export default function Preserve() {
       <Section title="Standings" aside={<span className="muted small">Updates every 15 seconds</span>}>
         <div className="table-wrap">
           <table className="grid">
-            <thead><tr><th>Player</th><th className="num">Thru</th><th className="num">Strokes</th><th className="num">Points</th></tr></thead>
+            <thead><tr><th>Player</th><th className="num th-wrap" title="13/18 of handicap after Wednesday">Starting<br />pts</th><th className="num">Thru</th><th className="num">Pts</th><th className="num">Total</th></tr></thead>
             <tbody>
               {board.map(({ p, holes: h }) => (
                 <tr key={p} className={who === p ? 'me-row' : ''}>
                   <td><span className="who"><TeamDot team={players[p]?.team} />{players[p]?.initials}</span></td>
+                  <td className="num">{start[p]}</td>
                   <td className="num">{thru(h) || '—'}</td>
-                  <td className="num">{thru(h) ? strokes(h) : '—'}</td>
-                  <td className="num strong">{thru(h) ? total(h) : '—'}{thru(h) && total(h) === leaderPts && leaderPts > 0 ? ' ★' : ''}</td>
+                  <td className="num">{thru(h) ? total(h) : '—'}</td>
+                  <td className="num strong">{grand(p, h)}{anyStarted && grand(p, h) === leaderPts ? ' ★' : ''}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <p className="note">Starting points are 13/18 of each player’s Handicap Index after Wednesday’s +1/−1 adjustments, rounded down (e.g. 12.7 × 0.722 = 9.17 → 9). Total = starting points + Stableford points.{!wedDone && ' Wednesday’s results aren’t all posted yet, so these will update once they are.'}</p>
       </Section>
 
       <Section title="Enter a card">
@@ -128,8 +141,8 @@ export default function Preserve() {
           <>
             <div className="sf-head">
               <span className="strong">{players[who]?.name}</span>
-              <span className="sf-total">{total(card)} pts</span>
-              <span className="muted small">{thru(card)} of 13 · {strokes(card) || 0} strokes</span>
+              <span className="sf-total">{start[who] + total(card)} total</span>
+              <span className="muted small">{start[who]} starting + {total(card)} pts · {thru(card)} of 13 · {strokes(card) || 0} strokes</span>
             </div>
             <div className="sf-grid">
               {holes.map((h, i) => {

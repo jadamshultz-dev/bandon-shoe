@@ -35,7 +35,7 @@ The paper scorecard is always the official record.
 
 ## Thursday Preserve Stableford
 
-The one place players enter scores themselves: More → Preserve Stableford (or the button on Thursday's My Day). Any of the eight Preserve players taps a name and picks a score for each hole; points (ace 10, birdie 5, par 3, bogey 1, worse 0; anything worse than bogey is entered as a 5) and the standings update for everyone within 15 seconds.
+The one place players enter scores themselves: More → Preserve Stableford (or the button on Thursday's My Day). Any of the eight Preserve players taps a name and picks a score for each hole; points (ace 10, birdie 5, par 3, bogey 1, worse 0; anything worse than bogey is entered as a 5) and the standings update for everyone within 15 seconds. Each player also gets Starting Points: 13/18 of his Handicap Index after Wednesday's +1/−1 adjustments, rounded down; his total is Starting Points plus Stableford points.
 
 Scores are stored by a small Netlify Function (`netlify/functions/preserve.mjs`) in Netlify Blobs. Nothing to set up: Netlify creates the store on the first save.
 
