@@ -31,7 +31,7 @@ export default function Leaderboard() {
         {['DCBG', 'JES'].map((team) => (
           <div key={team} className={`board-team ${team === 'DCBG' ? 'dcbg' : 'jes'} ${lead === team ? 'leading' : ''}`}>
             <div className="board-name">{teamName(team, settings)}</div>
-            <div className="board-pts">{fmt(st.pts[team])}</div>
+            <div className="board-score"><span className={`team-logo ${team === 'DCBG' ? 'dcbg' : 'jes'}`} role="img" aria-label={`${teamName(team, settings)} logo`} /><div className="board-pts">{fmt(st.pts[team])}</div></div>
             <div className="board-sub">{st.pts[team] >= st.toWin ? 'Won' : `${fmt(Math.max(0, st.toWin - st.pts[team]))} to win`}</div>
           </div>
         ))}
