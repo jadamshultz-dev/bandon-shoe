@@ -88,7 +88,7 @@ export default function MyDay() {
       </div>
 
       <Section title="Tee times">
-        {mine.length === 0 && preserveTimes.length === 0 && <Empty>{date === '2026-11-07' ? 'Singles at Bandon Dunes. Tee times and groups TBD, set Friday night at dinner based on prior results.' : date === '2026-11-02' && who?.id !== 'aw' ? 'Your Monday group isn’t set yet. The 12:00 Bandon Trails time is still open.' : `No golf for ${who?.initials} on ${dayLabel(date)}.`}</Empty>}
+        {mine.length === 0 && preserveTimes.length === 0 && <Empty>{date === '2026-11-07' ? 'Singles at Bandon Dunes. Tee times and groups TBD, set Friday night at dinner based on prior results.' : `No golf for ${who?.initials} on ${dayLabel(date)}.`}</Empty>}
         {mine.map((t) => <RoundCard key={t.id} t={t} who={who} players={players} courses={courses} results={results} teeTimes={teeTimes} allResults={list('results')} settings={settings} />)}
         {preserveTimes.length > 0 && !mine.some((t) => t.kind === 'optional') && (
           <div className="card round optional">

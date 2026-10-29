@@ -42,9 +42,7 @@ const T = (id, date, time, course, session, kind, list, extra = {}) => ({
 });
 
 const teeTimes = [
-  // Monday practice rounds from Marc's sheet. The 12:00 Bandon Trails time is on the resort confirmation
-  // but not on Marc's sheet, so its group is left open until he confirms it.
-  T('mon-1200-bt', '2026-11-02', '12:00', 'bandon-trails', null, 'casual', []),
+  // Monday practice rounds from Marc's sheet. (The open 12:00 Bandon Trails time was dropped.)
   T('mon-1210-om', '2026-11-02', '12:10', 'old-macdonald', null, 'casual', [['gn'], ['sc'], ['mt'], ['ap']]),
   T('mon-1220-bd', '2026-11-02', '12:20', 'bandon-dunes', null, 'casual', [['ms'], ['cl'], ['rw'], ['mp']]),
 

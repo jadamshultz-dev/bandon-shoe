@@ -252,18 +252,6 @@
   ],
   "tee_times": [
     {
-      "id": "mon-1200-bt",
-      "date": "2026-11-02",
-      "time": "12:00",
-      "course": "bandon-trails",
-      "session": null,
-      "kind": "casual",
-      "players": [],
-      "caddies": {},
-      "paceSetter": false,
-      "adjust": {}
-    },
-    {
       "id": "mon-1210-om",
       "date": "2026-11-02",
       "time": "12:10",
