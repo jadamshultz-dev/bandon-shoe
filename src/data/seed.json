@@ -1022,24 +1022,24 @@
         {
           "name": "Black",
           "yards": 6633,
-          "rating": 73,
-          "slope": 142,
+          "rating": 73.2,
+          "slope": 143,
           "par": 71,
           "default": false
         },
         {
           "name": "Green",
           "yards": 6142,
-          "rating": 70.7,
-          "slope": 133,
+          "rating": 70.8,
+          "slope": 135,
           "par": 71,
           "default": true
         },
         {
           "name": "Gold",
           "yards": 5775,
-          "rating": 68.6,
-          "slope": 129,
+          "rating": 68.9,
+          "slope": 131,
           "par": 71,
           "default": false
         }
