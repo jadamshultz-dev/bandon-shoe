@@ -1,4 +1,35 @@
 {
-  "updated": "2026-10-28T14:40:00-04:00",
-  "results": []
+  "updated": "2026-11-05T03:42:02.664Z",
+  "results": [
+    {
+      "id": "wed-0720-sr",
+      "winner": "JES",
+      "margin": ""
+    },
+    {
+      "id": "wed-0730-sr",
+      "winner": "DCBG",
+      "margin": ""
+    },
+    {
+      "id": "wed-0740-sr",
+      "winner": "halved",
+      "margin": ""
+    },
+    {
+      "id": "wed-1220-bd",
+      "winner": "DCBG",
+      "margin": ""
+    },
+    {
+      "id": "wed-1220-pd",
+      "winner": "JES",
+      "margin": ""
+    },
+    {
+      "id": "wed-1230-bd",
+      "winner": "DCBG",
+      "margin": ""
+    }
+  ]
 }

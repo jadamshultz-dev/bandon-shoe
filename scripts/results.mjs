@@ -33,11 +33,10 @@ if (cmd === 'list') {
   const u = units.find((x) => x.id === id);
   if (!u) { console.error(`No match "${id}". Run: node scripts/results.mjs list`); process.exit(1); }
   if (!['DCBG', 'JES', 'halved'].includes(winner)) { console.error('Winner must be DCBG, JES or halved'); process.exit(1); }
-  if (winner !== 'halved' && !margin) { console.error('Give a margin, e.g. "3&2" or "1 up"'); process.exit(1); }
   data.results = data.results.filter((x) => x.id !== id);
-  data.results.push({ id, winner, margin: winner === 'halved' ? '' : margin });
+  data.results.push({ id, winner, margin: winner === "halved" ? "" : (margin || "") });
   save();
-  console.log(`Posted ${name(u.DCBG)} v ${name(u.JES)}: ${winner === 'halved' ? 'halved' : `${winner} ${margin}`}`);
+  console.log(`Posted ${name(u.DCBG)} v ${name(u.JES)}: ${winner === 'halved' ? 'halved' : `${winner} ${margin || "won"}`}`);
 } else if (cmd === 'clear') {
   data.results = data.results.filter((x) => x.id !== id);
   save();
