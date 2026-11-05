@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '../lib/store.jsx';
-import { stablefordPoints, equitableAdjustments } from '../lib/golf.js';
+import { stablefordPoints } from '../lib/golf.js';
 import { Back, PageHead, Section, TeamDot, useLookups } from '../ui.jsx';
 
 // Thursday's optional Bandon Preserve round: open Stableford scorecard any participant can fill in.
@@ -10,7 +10,7 @@ const LOCAL = 'bandon-shoe-preserve-draft';
 const blank = () => Array(13).fill(null);
 const total = (holes) => (holes || []).reduce((s, h) => s + (stablefordPoints(h) ?? 0), 0);
 const thru = (holes) => (holes || []).filter((h) => h !== null && h !== undefined).length;
-// Starting points: 13/18 (0.722) of the player's Handicap Index after Wednesday's adjustments, rounded down.
+// Starting points: 13/18 (0.722) of the player's Handicap Index, rounded down.
 export const START_FACTOR = 13 / 18;
 export const startingPoints = (index, adj = 0) => (index === null || index === undefined ? 0 : Math.floor((Number(index) + adj) * START_FACTOR));
 const strokes = (holes) => (holes || []).reduce((s, h) => s + (h || 0), 0);
@@ -88,11 +88,8 @@ export default function Preserve() {
     save(who, next);
   };
 
-  const results = list('results');
-  const eq = equitableAdjustments(teeTimes, results, players, settings, 'thu');
-  const wedIds = teeTimes.filter((x) => x.session === 'wed-am' || x.session === 'wed-pm').map((x) => x.id);
-  const wedDone = wedIds.every((id) => results.some((r) => r.id === id));
-  const start = Object.fromEntries(PRESERVE_PLAYERS.map((p) => [p, startingPoints(players[p]?.index, eq[p] || 0)]));
+  // Starting points use each player's locked Handicap Index, without Wednesday's adjustments.
+  const start = Object.fromEntries(PRESERVE_PLAYERS.map((p) => [p, startingPoints(players[p]?.index)]));
   const grand = (p, h) => start[p] + total(h);
   const board = PRESERVE_PLAYERS.map((p) => ({ p, holes: scores[p]?.holes })).sort((a, b) => grand(b.p, b.holes) - grand(a.p, a.holes) || thru(b.holes) - thru(a.holes));
   const leaderPts = grand(board[0]?.p, board[0]?.holes);
@@ -111,7 +108,7 @@ export default function Preserve() {
       <Section title="Standings" aside={<span className="muted small">Updates every 15 seconds</span>}>
         <div className="table-wrap">
           <table className="grid">
-            <thead><tr><th>Player</th><th className="num th-wrap" title="13/18 of handicap after Wednesday">Starting<br />pts</th><th className="num">Thru</th><th className="num">Pts</th><th className="num">Total</th></tr></thead>
+            <thead><tr><th>Player</th><th className="num th-wrap" title="13/18 of Handicap Index">Starting<br />pts</th><th className="num">Thru</th><th className="num">Pts</th><th className="num">Total</th></tr></thead>
             <tbody>
               {board.map(({ p, holes: h }) => (
                 <tr key={p} className={who === p ? 'me-row' : ''}>
@@ -125,7 +122,7 @@ export default function Preserve() {
             </tbody>
           </table>
         </div>
-        <p className="note">Starting points are 13/18 of each player’s Handicap Index after Wednesday’s +1/−1 adjustments, rounded down (e.g. 12.7 × 0.722 = 9.17 → 9). Total = starting points + Stableford points.{!wedDone && ' Wednesday’s results aren’t all posted yet, so these will update once they are.'}</p>
+        <p className="note">Starting points are 13/18 of each player’s Handicap Index, rounded down (e.g. 12.7 × 0.722 = 9.17 → 9). Total = starting points + Stableford points.</p>
       </Section>
 
       <Section title="Enter a card">
