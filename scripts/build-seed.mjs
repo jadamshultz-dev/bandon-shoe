@@ -65,7 +65,7 @@ const teeTimes = [
 
   T('fri-0730-pd', '2026-11-06', '07:30', 'pacific-dunes', 'fri-am', 'match', [['ms', SD], ['jon'], ['sc', SD], ['ap']], { paceSetter: true }),
   T('fri-0740-pd', '2026-11-06', '07:40', 'pacific-dunes', 'fri-am', 'match', [['rw', PK], ['gn', PK], ['court', JJ], ['mt', JJ]], { paceSetter: true }),
-  T('fri-0750-pd', '2026-11-06', '07:50', 'pacific-dunes', 'fri-am', 'match', [['aw', BH], ['joel', BH], ['josh', BJ], ['mp', BJ]], { paceSetter: true }),
+  T('fri-0750-pd', '2026-11-06', '07:50', 'pacific-dunes', 'fri-am', 'match', [['aw', BH], ['joel', BH], ['josh', BJ], ['mp', BJ]], { paceSetter: true, adjust: { joel: -2 } }), // Marc's card: Joel plays off 9
   T('fri-1230-om', '2026-11-06', '12:30', 'old-macdonald', 'fri-pm', 'match', [['ms', SD], ['joel', SD], ['mp', BJ], ['court', BJ]]),
   T('fri-1230-sr', '2026-11-06', '12:30', 'sheep-ranch', 'fri-pm', 'match', [['gn', PK], ['jon'], ['ap'], ['josh', PK]]),
   T('fri-1240-sr', '2026-11-06', '12:40', 'sheep-ranch', 'fri-pm', 'match', [['rw', BH], ['aw', BH], ['sc', JJ], ['mt', JJ]]),
