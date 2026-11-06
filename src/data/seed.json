@@ -662,9 +662,7 @@
         "mp": "Bob Janus"
       },
       "paceSetter": true,
-      "adjust": {
-        "joel": -2
-      }
+      "adjust": {}
     },
     {
       "id": "fri-1230-om",
