@@ -1,10 +1,20 @@
 {
-  "updated": "2026-11-06T00:19:38.838Z",
+  "updated": "2026-11-06T01:24:46.666Z",
   "results": [
+    {
+      "id": "thu-1120-pd",
+      "winner": "DCBG",
+      "margin": ""
+    },
     {
       "id": "thu-1130-pd",
       "winner": "JES",
       "margin": "3&2"
+    },
+    {
+      "id": "thu-1140-pd",
+      "winner": "halved",
+      "margin": ""
     },
     {
       "id": "wed-0720-sr",
